@@ -692,6 +692,12 @@ text-transform: uppercase;
   margin-right: auto;
 }
 
+#trading_table{
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #contract_table{
   width: 80%;
   margin-left: auto;

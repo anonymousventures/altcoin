@@ -49,10 +49,12 @@
 <script>
 activated = {{{activated}}};
 user = {{{user}}};
-contracts = {{{contracts}}};
+coin_data = {{{coin_data}}};
+console.log(JSON.stringify(coin_data));
 //alert(JSON.stringify(contracts));
 
 </script>
+<script src="functions.js"></script>
 <script src="global.js"></script>
 
 <script>
@@ -82,7 +84,8 @@ contracts = {{{contracts}}};
         <!--
         <li class="active" style="margin-left: 30px"><a href="#">Link</a></li>
         -->
-        <li class="active"><a  href="trading">Trading</a></li>
+        <li class="active"><a  href="coin_trading">Currency Trading</a></li>
+        <li><a href="trading">Derivatives</a></li>
         <li><a href="fees">Fees</a></li>
         <li><a href="about">About</a></li>
         <li><a href="support">Support</a></li>
@@ -117,7 +120,7 @@ contracts = {{{contracts}}};
 
 
 <div class="center">
-<div id="voting_header"> Trading</div>
+<div id="voting_header"> Cryptocurrency Trading</div>
 </div>
 <div id="about_explanation">
 We currently support the following currency pairs.
@@ -136,7 +139,7 @@ Select expiration date:
 
 
 
-<div id="options_table"></div>
+<div id="trading_table"></div>
 
 
 </div>

@@ -204,7 +204,66 @@ order_id = $(this).attr('order_id');
 
 
 
+function generate_trading_table(){
 
+
+
+//$('.select_expiration').html(selection);
+
+//alert(deposits);
+string = '<table class="table table-bordered"  style="margin-bottom:50px">\
+        <thead>\
+          <tr>\
+            <th>Market</th>\
+            <th>Last Trading<br> Price</th>\
+            <th>Bid</th>\
+            <th>Ask</th>\
+            <th>Volume</th>\
+            <th>24 hour low</th>\
+            <th>24 hour high</th>\
+          </tr>\
+        </thead><tbody>';
+
+//string += table_top;
+
+//alert(string);
+//alert(JSON.stringify(contracts));
+
+$.each(coin_data, function(key,val){
+
+
+substring = '<tr id="tab_row" style="margin-bottom: 30px">\
+        <td class="tab_td_order"><a class="contract_page_href" ticker="' + val.coin_one_ticker + '">' + val.coin_one_ticker + '/' + val.coin_two_ticker + '</td>\
+        <td class="tab_td_order">' + val.last + '</td>\
+        <td class="tab_td_order">' + val.bid + '</td>\
+        <td class="tab_td_order">' + val.ask + '</td>\
+        <td class="tab_td_order">' + val.volume + '</td>\
+        <td class="tab_td_order">' + val.low + '</td>\
+        <td class="tab_td_order">' + val.high + '</td>\
+</tr>';
+//alert(substring);
+
+
+string += substring; 
+
+
+});
+
+
+
+
+//}
+
+
+string += '</tbody></table>'; 
+
+
+
+return string;
+
+
+
+}
 
 
 

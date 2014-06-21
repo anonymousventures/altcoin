@@ -130,7 +130,22 @@ $('#bottom_area').append(string);
 }
 
 
-if (document.URL.indexOf('trading') != -1 ){
+if (document.URL.indexOf('coin_trading') != -1){
+
+string = generate_trading_table();
+$('#trading_table').append(string);
+
+
+     $("a.contract_page_href").on("click",function(){
+         ticker = $(this).attr("ticker");
+         window.open(prefix + 'altmarket/' + ticker + '/btc' ,'_blank');
+     });
+
+}
+
+
+
+if (document.URL.indexOf('trading') != -1 &&  document.URL.indexOf('coin_trading') == -1){
 
 string = generate_options_table();
 $('#options_table').append(string);
