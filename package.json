@@ -13,7 +13,12 @@
     "socket.io": "latest",
     "consolidate": "latest",
     "connect-mongo": "latest",
-    "sendgrid": "latest"
+    "sendgrid": "latest",
+    "binary": "latest",
+    "bitfinex": "latest",
+    "bitstamp": "latest",
+    "ip": "latest",
+    "handlebars": "latest"
   },
   "scripts": {
     "start": "nodemon exchange.js",

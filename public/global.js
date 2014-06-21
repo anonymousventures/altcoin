@@ -471,77 +471,79 @@ $('#below_tab_wrapper').append(string);
 
 
 //alert('here');
-    $('#withdraw_amount').on('change', function () {
-      withdraw_amount = $('#withdraw_amount').val();
-      //alert('test');
-      //alert($('#withdraw_amount').val());
-      //alert($('#error_message').html());
-      if (withdraw_amount > balance){
-      if ($('#error_message').html().length < 3)
-      $('#error_message').append('Withdraw amount must be equal to or less than your available balance.');
-      }
-      else if (withdraw_amount - withdraw_fee <=0){
-      if ($('#error_message').html().length < 3)
-      $('#error_message').append('Your net withdraw amount is less than or equal to 0. Please enter a greater amount.');
-      if ($('#error_message').html().substr(0,3) == 'Wit'){
-        $('#error_message').empty();
-        $('#error_message').append('Your net withdraw amount is less than or equal to 0. Please enter a greater amount.');
-      }
+  //   $('#withdraw_amount').on('change', function () {
+  //     withdraw_amount = $('#withdraw_amount').val();
+  //     withdraw_fee = .0001;
+  //     //alert('test');
+  //     //alert($('#withdraw_amount').val());
+  //     //alert($('#error_message').html());
+  //     if (withdraw_amount > data.bitcoin.available_balance){
+  //     if ($('#error_message').html().length < 3)
+  //     $('#error_message').append('Withdraw amount must be equal to or less than your available balance.');
+  //     }
+  //     else if (withdraw_amount - withdraw_fee <=0){
+  //     if ($('#error_message').html().length < 3)
+  //     $('#error_message').append('Your net withdraw amount is less than or equal to 0. Please enter a greater amount.');
+  //     if ($('#error_message').html().substr(0,3) == 'Wit'){
+  //       $('#error_message').empty();
+  //       $('#error_message').append('Your net withdraw amount is less than or equal to 0. Please enter a greater amount.');
+  //     }
 
 
-      }    
-      else  {
-      $('#error_message').empty();
-      $('#net_withdraw_amount').html(withdraw_amount - 1)
+  //     }    
+  //     else  {
+  //     $('#error_message').empty();
+  //     $('#net_withdraw_amount').html(withdraw_amount - 1)
 
-      }
-  });
-
-
-    $('#withdraw_button').click(function(){
-        amount = $('#withdraw_amount').val();
-        address = $('#withdrawal_address').val();
-        password = $('#withdraw_password').val();
-
-        if ($('#error_message').html().length > 3)
-        $("html, body").animate({ scrollTop: 0 }, "slow");
-
-        else{
-
-        email = localStorage.getItem('email');
-        //alert(email);
-        $.ajax({
-          url: "/withdraw",
-          type: "POST",
-          data: {amount: amount, address: address, password: password, email: email, coin_name: coin_name},
-          dataType: "html"
-        }).done(function(data){
-                    //alert(data);
-          if (data == "withdraw"){
+  //     }
+  // });
 
 
-          string = '<div class="box_green"><span><span id="deposit_address">\
-          <span style="font-weight: bold">Success!</span><br>\
-          Your withdrawal request has now been added, please confirm by email and we will then process it.</span></span></div>\
-          </div>';
+    // $('#withdraw_button').click(function(){
+    //     //alert('yo');
+    //     amount = $('#withdraw_amount').val();
+    //     address = $('#withdrawal_address').val();
+    //     password = $('#withdraw_password').val();
 
-          $('.box').before(string);        
+    //     if ($('#error_message').html().length > 3)
+    //     $("html, body").animate({ scrollTop: 0 }, "slow");
 
-          $("html, body").animate({ scrollTop: 0 }, "slow");
+    //     else{
+
+    //     email = localStorage.getItem('email');
+    //     //alert(email);
+    //     $.ajax({
+    //       url: "/withdraw",
+    //       type: "POST",
+    //       data: {amount: amount, address: address, password: password, email: email, coin_name: coin_name},
+    //       dataType: "html"
+    //     }).done(function(data){
+    //                 //alert(data);
+    //       if (data == "withdraw"){
 
 
-          }
+    //       string = '<div class="box_green"><span><span id="deposit_address">\
+    //       <span style="font-weight: bold">Success!</span><br>\
+    //       Your withdrawal request has now been added, please confirm by email and we will then process it.</span></span></div>\
+    //       </div>';
 
-          else
-          alert(data);
+    //       $('.box').before(string);        
 
-        });
+    //       $("html, body").animate({ scrollTop: 0 }, "slow");
 
 
-        }
+    //       }
 
-        //alert('here');
-    });
+    //       else
+    //       alert(data);
+
+    //     });
+
+
+    //     }
+
+    //     //alert('here');
+    // });
 
 
 
@@ -845,7 +847,7 @@ if (val.txid == undefined)
 
 substring = '<tr id="tab_row">\
  <td class="expander unclicked" id="' + val.txid + '"> </td><td class="tab_td">' + withdrawal_time + '</td>\
-         <td class="tab_td">BTC</td>        <td class="tab_td">' + val.amount + '</td>\
+         <td class="tab_td">' + val.coin_ticker.toUpperCase() + '</td>        <td class="tab_td">' + val.amount + '</td>\
           <td class="tab_td">' + val.fee + '</td> <td class="tab_td">' + val.receiving_address + '</td> <td class="tab_td">' + status + '</td>\
 </tr>';
 string += substring;
@@ -1238,12 +1240,90 @@ function generate_orders(){
 //alert(deposits);
 
 
-    string = '<div class="tab_description">\
+
+//second part
+string = '<div class="tab_description">\
 Below is a list of orders that you have made. \
 Any completed orders will show up under trade history. <br><br>\
-Displaying orders 1 - ' + orders.length + ' of ' + orders.length +
+Displaying currency trading orders 1 - ' + orders.length + ' of ' + orders.length +
 '</div>\
 <table class="table table-bordered">\
+        <thead>\
+          <tr>\
+            <th>ORDER ID</th>\
+            <th>TYPE</th>\
+            <th>MARKET</th>\
+            <th>TIME</th>\
+            <th>PRICE</th>\
+            <th>AMOUNT</th>\
+            <th>TOTAL</th>\
+            <th>FEE</th>\
+            <th>NET TOTAL</th>\
+            <th></th>\
+          </tr>\
+        </thead><tbody>';
+
+
+$.each(orders, function(key,val){
+
+/*"time" : 1400544396647, "coin_one_ticker" : "doge", "coin_two_ticker" : "btc", "side" : "ask", "price" : 150, "quantity" : 1, "quantity_left" : 1, 
+"user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
+*/
+
+if (val.pending == 'pending' && val.swap == true){
+
+
+
+/*"time" : 1400544396647, "coin_one_ticker" : "doge", "coin_two_ticker" : "btc", "side" : "ask", "price" : 150, "quantity" : 1, "quantity_left" : 1, 
+"user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
+*/
+if (val.type == 'ask')
+  type = 'SELL';
+else
+  type = 'BUY';
+
+
+    
+    time = parseInt(val.time.toString().substring(0, val.time.toString().length - 3));
+    
+    array = moment.unix(time).toArray();
+    var hi = moment.utc(array);
+        //alert(hi);
+    hi = hi.toString();
+    index = hi.indexOf('GM');
+    hi = hi.substr(0, index);
+    order_time = hi;
+
+
+
+substring = '<tr id="tab_row">\
+        <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + type + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + val.coin_two_ticker.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + order_time + '</td>\
+        <td class="tab_td_order">' + val.price + '</td>\
+        <td class="tab_td_order">' + (val.quantity - val.quantity_left) + '</td>\
+        <td class="tab_td_order">' + (val.quantity - val.quantity_left)  * val.price + '</td>\
+        <td class="tab_td_order">' + '0.00' + '</td>\
+        <td class="tab_td_order">' + (val.quantity - val.quantity_left)  * val.price + '</td>\
+        <td class="tab_td_order">\
+        <a class="cancel_alt_order" href="#" order_id="' + val._id + '">\
+        <img src="' + prefix + 'img/delete.png"   alt="Cancel"  class="2x" width="16" style="margin-left: 14px"><br>  Cancel </a>\
+        </td>\
+</tr>';
+string += substring;
+
+
+}
+
+});
+
+string += '</tbody></table><br><br>'; 
+
+
+
+
+    string += 'Displaying derivatives orders 1 - ' + orders.length + ' of ' + orders.length + '<table class="table table-bordered">\
         <thead>\
           <tr>\
             <th>ORDER ID</th>\
@@ -1269,7 +1349,7 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
 
-if (val.pending == 'pending'){
+if (val.pending == 'pending' && val.swap != true){
 
 //if ( (val.pending == 'pending' || val.pending == 'complete') && val.quantity_left != 0){
 
@@ -1292,7 +1372,7 @@ else
     order_time = hi;
 
 console.log(val._id);
-
+console.log(val);
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
         <td class="tab_td_order">' + type + '</td>\
@@ -1314,7 +1394,19 @@ string += substring;
 
 });
 
-string += '</tbody></table>'; 
+string += '</tbody></table><br><br>'; 
+
+
+
+
+
+// alert('here');
+// console.log('here 2');
+
+
+// console.log('here 2');
+
+
 
 return string;
 
@@ -1341,9 +1433,89 @@ else if (val.pending == 'pending' && (val.quantity != val.quantity_left))
 });
 
 
-
     string = '<div class="tab_description">\
-Below is a list of completed orders that you have made. \
+Below is a list of completed currency trading orders that you have made. \
+Any pending orders will show up under \'Your Orders\'. <br><br>\
+Displaying orders 1 - ' + length + ' of ' + length +
+'</div>\
+<table class="table table-bordered">\
+        <thead>\
+          <tr>\
+            <th>ORDER ID</th>\
+            <th>TYPE</th>\
+            <th>MARKET</th>\
+            <th>TIME</th>\
+            <th>PRICE</th>\
+            <th>AMOUNT</th>\
+            <th>TOTAL</th>\
+            <th>FEE</th>\
+            <th>NET TOTAL</th>\
+          </tr>\
+        </thead><tbody>';
+
+
+//alert(string);
+
+
+$.each(orders, function(key,val){
+  console.log(JSON.stringify(val));
+
+/*"time" : 1400544396647, "coin_one_ticker" : "doge", "coin_two_ticker" : "btc", "side" : "ask", "price" : 150, "quantity" : 1, "quantity_left" : 1, 
+"user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
+*/
+  //console.log('ah ' + JSON.stringify(val));
+if (val.swap == true){
+if ( val.pending == 'complete'){
+
+  //console.log('ah ' + JSON.stringify(val));
+if (val.side == 'ask')
+  type = 'SELL';
+else
+  type = 'BUY';
+
+
+    
+    time = parseInt(val.time.toString().substring(0, val.time.toString().length - 3));
+    
+    array = moment.unix(time).toArray();
+    var hi = moment.utc(array);
+        //alert(hi);
+    hi = hi.toString();
+    index = hi.indexOf('GM');
+    hi = hi.substr(0, index);
+    order_time = hi;
+
+substring = '<tr id="tab_row">\
+        <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + type + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + val.coin_two_ticker.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + order_time + '</td>\
+        <td class="tab_td_order">' + val.price + '</td>\
+        <td class="tab_td_order">' + val.quantity + '</td>\
+        <td class="tab_td_order">' + val.quantity * val.price + '</td>\
+        <td class="tab_td_order">' + '0.00' + '</td>\
+        <td class="tab_td_order">' + val.quantity * val.price  + '</td>\
+</tr>';
+string += substring;
+
+}
+}
+
+});
+
+string += '</tbody></table>'; 
+
+
+
+
+
+
+
+// second part
+
+
+    string += '<br><br><br><div class="tab_description">\
+Below is a list of completed derivatives orders that you have made. \
 Any pending orders will show up under \'Your Orders\'. <br><br>\
 Displaying orders 1 - ' + length + ' of ' + length +
 '</div>\
@@ -1375,7 +1547,8 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
   //console.log('ah ' + JSON.stringify(val));
-if (val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left)) || val.pending == 'exercised' || val.pending == 'expired'){
+if (val.swap != true){
+if ( val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left)) || val.pending == 'exercised' || val.pending == 'expired'){
 
   //console.log('ah ' + JSON.stringify(val));
 if (val.side == 'ask')
@@ -1464,6 +1637,7 @@ string += substring;
 }
 
 
+}
 }
 
 });
@@ -1623,7 +1797,7 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
   //console.log('ah ' + JSON.stringify(val));
-if (val.side == 'bid' && val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left)) ){
+if (val.swap != true && (val.side == 'bid' && val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left))) ){
 
   //console.log('ah ' + JSON.stringify(val));
 if (val.side == 'ask')
@@ -1778,13 +1952,200 @@ order_id = $(this).attr('order_id');
 
 
 
+
+
+
   }
 
 
 
 
-  if (document.URL.indexOf('market') != -1){
 
+
+  if (document.URL.indexOf('altmarket') != -1){
+
+
+    coin_one_ticker_upper = coin_one_ticker.toUpperCase();
+    coin_two_ticker_upper = coin_two_ticker.toUpperCase();
+
+    coin_one_name_modified = coin_one_name.substr(0,1).toUpperCase() + coin_one_name.substr(1,coin_one_name.length);
+    coin_two_name_modified = coin_two_name.substr(0,1).toUpperCase() + coin_two_name.substr(1,coin_two_name.length);
+
+    coin_one_ticker_modified = coin_one_ticker.substr(0,1).toUpperCase() + coin_one_ticker.substr(1,coin_one_ticker.length);
+    coin_two_ticker_modified = coin_two_ticker.substr(0,1).toUpperCase() + coin_two_ticker.substr(1,coin_two_ticker.length);
+
+    last_price = last_price.toPrecision(9);
+    low_price = low_price.toPrecision(9);
+    high_price = high_price.toPrecision(9);
+    volume = volume.toPrecision(9);
+
+    coin_one_balance = coin_one_balance.toPrecision(9);
+    coin_two_balance = coin_two_balance.toPrecision(9);
+
+    min_order = 1;
+    order_fee = 0;
+
+
+
+    if ( pending_asks == null){
+      pending_asks = new Array();
+      obj = new Object();
+      obj.price = 0;
+      obj.quantity_left = 0;
+      pending_asks.push(obj);
+    }
+
+    if (pending_bids == null){
+      pending_bids = new Array();
+      obj = new Object();
+      obj.price = 0;
+      obj.quantity_left = 0;
+      pending_bids.push(obj);
+    }
+
+
+
+
+    string = '<div id="top_header">\
+    <div id="left_header">\
+    <div id="trade_pair_header">' 
+    + coin_one_ticker_upper + '/' + coin_two_ticker_upper +
+    '</div>'
+    + coin_one_name_modified + '/' + coin_two_name_modified + 
+    '</div>\
+    <div id="right_header">\
+    <div class="stat">\
+    <span class="title">LAST PRICE</span>\
+    <br>\
+    <strong>\
+    <span id="span_last_price" class="">' + last_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat">\
+    <span class="title">24 HR HIGH</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_high" class="">' + high_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat">\
+    <span class="title">24 HR LOW</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_low" class="">' + low_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat unbordered">\
+    <span class="title">24 HR VOLUME</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_low" class="">' + volume + ' ' + coin_two_ticker_upper + '</span>\
+    </strong>\
+    </div>\
+    </div>\
+    </div>\
+    <div style="clear:right;"></div>\
+    <div id="chartdiv" style="width:85%; height:600px; margin-top: 60px"></div>\
+    <div id="buy_sell">\
+    <div id="col1">\
+    <h3>Buy ' + coin_one_ticker_modified + '</h3>\
+    <div id="error_message"></div>\
+    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="box options">\
+                <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
+                <span class="label_style">Price Per ' + coin_one_ticker_upper + ':</span> <input type="number" id="bid_price" name="price" value="' + pending_asks[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
+                <span class="label_style">Total:</span> <span class="total" id="buy_total">' + pending_asks[0].price.toPrecision(9) + '</span> <br>\
+                <span class="label_style">Trading Fee:</span> <span class="fee" id="buy_fee">0.00000000</span> BTC (' + (10 * order_fee).toPrecision(2) +  '%)<br>\
+                <span class="label_style">Net Total:</span> <span class="netTotalBuy" >' + pending_asks[0].price.toPrecision(9) + '</span> ' + coin_two_ticker_upper + 
+                '           <input type="hidden" name="buyNetTotal" id="buy_net_total" value="' + pending_asks[0].price.toPrecision(9) + '" class="required">\
+    </div>\
+    <button type="button" class="btn btn-primary" id="buy_order">Submit Buy Order</button>\
+    <h3>Sell Orders </h3>\
+    <div class="scroll_table">\
+    <table class="table" id="sell_table">\
+    <tbody>\
+    <tr>\
+                  <th>PRICE (' + coin_two_ticker_upper + ')</th>\
+                  <th>' + coin_one_ticker_upper + '</th>\
+                  <th>' + coin_two_ticker_upper + '</th>\
+                </tr>';
+
+
+    $.each(pending_asks, function(key,val){
+    substring = '<tr price="0.00000103">\
+    <td >' + val.price.toPrecision(9) + '</td>\
+    <td >' + val.quantity_left.toPrecision(9) + '</td>\
+    <td >' + (val.price * val.quantity_left).toPrecision(9) + '</td></tr>';
+    string += substring;
+    });
+
+
+//alert(string);
+
+
+    string += '</tbody>\
+    </table>\
+    </div>\
+    </div>\
+    <div id="col2">\
+    <h3>Sell ' + coin_one_ticker_modified + '</h3>\
+            <div id="error_message_sell"></div>\
+    <div class="fail box">Your ' + coin_one_ticker_upper +' balance is <strong><a href="asdf" class="exchange_balance">' + coin_one_balance + '</a></strong>.</div>\
+    <div class="box options">\
+                <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
+                <span class="label_style">Price Per ' + coin_one_ticker_upper + ':</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
+                <span class="label_style">Total:</span> <span class="total" id="buy_total">' + pending_bids[0].price.toPrecision(9) + '</span> <br>\
+                <span class="label_style">Trading Fee:</span> <span class="fee" id="buy_fee">0.00000000</span> BTC (' + (10 * order_fee).toPrecision(2) +  '%)<br>\
+                <span class="label_style">Net Total:</span> <span class="netTotalSell" >' + pending_bids[0].price.toPrecision(9) + '</span> ' + coin_two_ticker_upper + 
+                '           <input type="hidden" name="buyNetTotal" id="buy_net_total" value="' + pending_bids[0].price.toPrecision(9) + '" class="required">\
+              </div>\
+    <button type="button" class="btn btn-primary" id="ask_submit">Submit Sell Order</button>\
+    <h3>Buy Orders </h3>\
+    <div class="scroll_table">\
+    <table class="table" id="sell_table">\
+    <tbody>\
+    <tr>\
+                  <th>PRICE (' + coin_two_ticker_upper + ')</th>\
+                  <th>' + coin_one_ticker_upper + '</th>\
+                  <th>' + coin_two_ticker_upper + '</th>\
+                </tr>';
+
+    $.each(pending_bids, function(key,val){
+    substring = '<tr price="0.00000103">\
+    <td >' + val.price.toPrecision(9) + '</td>\
+    <td >' + val.quantity_left.toPrecision(9) + '</td>\
+    <td >' + (val.price * val.quantity_left).toPrecision(9) + '</td></tr>';
+    string += substring;
+    });
+
+
+    string += '</tbody>\
+    </table>\
+    </div>\
+    </div>\
+    </div>';
+
+
+
+
+$('.inner_content').append(string);
+
+
+
+add_price_handlers();
+
+add_order_handlers();
+
+
+
+  }
+
+
+
+
+
+  if (document.URL.indexOf('market') != -1 && document.URL.indexOf('altmarket') == -1 ){
+console.log('fucker');
 /*
 available_balance = {{{available_balance}}};
 contract = {{{contract}}};
@@ -2223,6 +2584,8 @@ $('.inner_content').append(string);
       ask_quantity = $('#ask_quantity').val();
       ask_price = $('#ask_price').val();
       sell_margin = parseFloat($('#sell_margin').html());
+
+
       //alert(ask_quantity);
       //alert(ask_price);
       //alert(buy_amount);
@@ -2257,21 +2620,113 @@ $('.inner_content').append(string);
   }
 
 
+function first_letter_upper(string){
+  first_letter = string.substr(0,1).toUpperCase();
+  rest = string.substr(1);
+  result = first_letter + rest;
+  return result;
+
+}
+
+function generate_deposits(){
+
+      //$('#deposits_li').attr('class', 'active');
+
+    deposits = data.deposits;
+    deposit_count = deposits.length;
+
+//alert(deposits);
+
+    string = '<div class="tab_description">\
+Below is a list of deposits that you have made. Click the expander icon on the left of each row to reveal more details \
+about the deposit.<br><br>\
+To make a new deposit, please visit the Balances page and select the Deposit option under the actions menu for \
+the coin.\
+<br><br>\
+Displaying deposits 1 - ' + deposits.length + ' of ' + deposits.length +
+'</div>\
+<table class="table table-bordered">\
+        <thead>\
+          <tr>\
+            <th></th>\
+            <th>TIME</th>\
+            <th>COIN</th>\
+            <th>AMOUNT</th>\
+            <th>DEPOSIT ADDRESS</th>\
+            <th>STATUS</th>\
+          </tr>\
+        </thead><tbody>';
+
+$.each(deposits, function(key,val){
+//ticker_upper = val.coin_ticker.toUpperCase();
+var status;
+if (val.pending == false)
+  status = 'CONFIRMED';
+else
+  status = 'PENDING';
+
+    
+    time = parseInt(val.time.toString().substring(0, val.time.toString().length - 3));
+    
+    //change later 'wtf is this lol'
+    array = moment.unix(time).toArray();
+    var hi = moment.utc(array);
+        //alert(hi);
+    hi = hi.toString();
+    index = hi.indexOf('GM');
+    hi = hi.substr(0, index);
+    deposit_time = hi;
+    //end change later
+
+
+  substring = '<tr id="tab_row">\
+   <td class="expander unclicked" id="' + val.txid + '"> </td><td class="tab_td">' + deposit_time + '</td>\
+           <td class="tab_td">' + val.coin_ticker.toUpperCase() +  '</td>        <td class="tab_td">' + val.amount + '</td>\
+           <td class="tab_td">' + val.deposit_address + '</td> <td class="tab_td">' + status + '</td>\
+  </tr>';
+  string += substring;
+
+  });
+
+  string += '</tbody></table>'; 
+
+  //$('#below_tab_wrapper').append(string);
+
+
+
+
+
+  return string;
+
+}
+
   if (document.URL.indexOf('balances') != -1){
     
     $('#balances_li').attr('class', 'active');
     
 
-a_string ='<div class="table-responsive"><table class="table table-bordered">\
+    array = new Array();
+    array.push(data.bitcoin);
+    array.push(data.dogecoin);
+    array.push(data.litecoin);
+
+    array.sort(function(a,b){return a.coin_number - b.coin_number});
+
+
+
+a_string = ' *Net in orders denotes how much your balance will go down by if all your orders are processed.<br><br>';
+
+$.each(array, function(key,val){
+
+a_string += '<div class="table-responsive"><table class="table table-bordered">\
         <thead>\
           <tr>\
-            <th>CURERNCY</th>\
-            <th>AMOUNT</th>\
-            <th>MARGIN  <br> (in positions)</th>\
-            <th>MARGIN  <br> (in orders)</th>\
+            <th>CURRENCY</th>\
+            <th>CODE</th>\
+            <th>BALANCE</th>\
+            <th>IN POSITIONS</th>\
+            <th>IN ORDERS</th>\
             <th>NET IN ORDERS * </th>\
-            <th>Required<br>Margin</th>\
-            <th>Total Maintenance<br>Margin</th>\
             <th>AVAILABLE</th>\
             <th>PENDING <br>DEPOSITS</th>\
             <th>PENDING <br>WITHDRAWALS</th>\
@@ -2279,19 +2734,20 @@ a_string ='<div class="table-responsive"><table class="table table-bordered">\
         </thead>\
         <tbody>\
           <tr>\
-            <td>BTC</td>\
-            <td>'+ data.balance.toPrecision(6) + '</td>\
-            <td>'+ data.in_positions.toPrecision(6)  + '</td>\
-            <td>'+ data.in_orders.toPrecision(6)  + '</td>\
-            <td>'+ data.in_orders_non_margin.toPrecision(6)  + '</td>\
-            <td>'+ data.required_margin.toPrecision(6)  + '</td>\
-            <td>'+ data.maintenance_margin.toPrecision(6)  + '</td>\
-            <td>'+ data.available_balance.toPrecision(6)  + '</td>\
-            <td>'+ data.pending_deposits.toPrecision(6)  + '</td>\
-            <td>'+ data.pending_withdrawals.toPrecision(6)  + '</td>\
+            <td>' + first_letter_upper(val.coin_name) + '</td>\
+            <td>' + val.code.toUpperCase() + '</td>\
+            <td>'+ val.balance.toPrecision(6) + '</td>\
+            <td>'+ val.in_positions.toPrecision(6)  + '</td>\
+            <td>'+ val.in_orders.toPrecision(6)  + '</td>\
+            <td>'+ val.in_orders_non_margin.toPrecision(6)  + '</td>\
+            <td>'+ val.available_balance.toPrecision(6)  + '</td>\
+            <td>'+ val.pending_deposits.toPrecision(6)  + '</td>\
+            <td>'+ val.pending_withdrawals.toPrecision(6)  + '</td>\
           </tr>\
         </tbody>\
-      </table></div><br> *Denotes how much your balance will go down by if all your orders are processed.'
+      </table></div>'
+
+});
 
 
 yolo ='<table class="table" id="tab_table">\
@@ -2323,19 +2779,28 @@ yolo ='<table class="table" id="tab_table">\
 
 
 
-b_string = 'To add bitcoins, send to this address: <span style="font-weight: bold">' + data.deposit_address + '</span>';
+
+
+b_string = 'Select coin to deposit to get deposit address: <br> <br><select id="select_deposit" class="form-control" style="width:100px">';
+
+$.each(array, function(key,val){
+
+b_string += '<option value="'+ val.coin_name + '">' + first_letter_upper(val.coin_name) +'</option>';
+
+});
+
+b_string += '</select><div id="address_info">To add bitcoins, send to this address: <span style="font-weight: bold">' + data.bitcoin.deposit_address + '</span></div>';
 
 
 
 
-
-c_string = '<div id="tab_content">\
+c_string_ending = '<div id="withdraw_info"> <div id="tab_content">\
 <div class="tab_description"><div class="box"><span>\
 <span id="deposit_address">Once submitted, all requests MUST be confirmed via email. \
 Please only contact support if you have not received the confirmation email.</span></span>\
 </div></div>\
 <div id="withdraw_available_balance">\
-Your current available BTC balance: ' + data.available_balance + '</div>\
+Your current available BTC balance: ' + data.bitcoin.available_balance + '</div>\
 <div class="tab_header_modified" >\
 Amount to Withdraw\
 </div>\
@@ -2346,7 +2811,7 @@ Amount to Withdraw\
 Withdraw fee\
 </div>\
 <div class="tab_description">\
-.0001 BTC </div>\
+' + data.bitcoin.withdraw_fee + 'BTC </div>\
 <div class="tab_header_modified">\
 Net Withdraw amount\
 </div>\
@@ -2367,11 +2832,26 @@ Please ensure all details are correct before submitting. Every request must be c
 before it will be processed, most withdrawals are processed within 10 minutes of email confirmation. For \
 security reasons, larger withdrawals can take longer as they may require manual verification. \
 </div>\
-<button type="button" class="btn btn-primary" id="withdraw_button" style="margin-top: 30px; margin-bottom: 100px">Withdraw</button></div>';
+<button type="button" class="btn btn-primary" id="withdraw_button" style="margin-top: 30px; margin-bottom: 100px">Withdraw</button></div></div>';
 
+
+
+c_string = 'Select coin to withdraw: <br> <br><select id="select_withdraw" class="form-control" style="width:100px">';
+
+$.each(array, function(key,val){
+
+c_string += '<option value="'+ val.coin_name + '">' + first_letter_upper(val.coin_name) +'</option>';
+
+});
+
+c_string += '</select>';
+c_string += c_string_ending;
 
 //c_string = 'yolo';
 //alert(c_string);
+
+
+
 
 d_string = generate_deposits();
 
@@ -2426,7 +2906,7 @@ string = '<ul class="nav nav-pills nav-stacked " id="nav_pills" style="margin-to
   <li class="" id="your_trades"><a href="#your_trade_history_tab" data-toggle="tab" class="top_href">Your Trade History</a></li>\
   <li class="" id="your_options"><a href="#your_exercise_options_tab" data-toggle="tab" class="top_href">Exercise Options</a></li>\
 </ul>\
-<div class="tab-content col-md-10">\
+<div class="tab-content">\
         <div class="tab-pane tab_add" id="your_profile_tab">\
              <h3>Your Profile</h3><br>' + a1_string + '</div>\
         <div class="tab-pane tab_add" id="your_funds_tab">\
@@ -2450,6 +2930,7 @@ string = '<ul class="nav nav-pills nav-stacked " id="nav_pills" style="margin-to
 
 $('#balances').prepend(string); 
 
+add_withdraw_shit();
 
 
   $('#right_bar').empty();
@@ -2574,21 +3055,154 @@ else{
 }
 
 
+$('#select_deposit').change(function() {
+        val = $(this).val();
+          $.ajax({
+          url: "/select_deposit",
+          type: "POST",
+          data: {coin: val},
+          dataType: "html"
+        }).done(function(data){
+
+          string = 'To add ' + val + 's, send to this address: <span style="font-weight: bold">' + data + '</span>';
+          $('#address_info').empty();
+
+          $('#address_info').append(string);
+
+        });
+});
 
 
+$('#select_withdraw').change(function() {
+
+
+        val = $(this).val();
+          $.ajax({
+          url: "/select_withdraw",
+          type: "POST",
+          data: {coin: val},
+          dataType: "html"
+        }).done(function(data){
+
+    data = $.parseJSON(data);
+
+string = '<div id="tab_content">\
+<div class="tab_description"><div class="box"><span>\
+<span id="deposit_address">Once submitted, all requests MUST be confirmed via email. \
+Please only contact support if you have not received the confirmation email.</span></span>\
+</div></div>\
+<div id="withdraw_available_balance">\
+Your current available ' + data.code.toUpperCase() + ' balance: ' + data.available_balance + '</div>\
+<div class="tab_header_modified" >\
+Amount to Withdraw\
+</div>\
+<div id="error_message">\
+</div>\
+<input type="number" name="amount" id="withdraw_amount" value="0" required="required" class="error">\
+</input> ' + data.code.toUpperCase() + '<div class="tab_header_modified">\
+Withdraw fee\
+</div>\
+<div class="tab_description">\
+' + data.withdraw_fee + ' '+ data.code.toUpperCase() + '</div>\
+<div class="tab_header_modified">\
+Net Withdraw amount\
+</div>\
+<div class="tab_description" id="net_withdraw_amount">\
+0.000000  ' + data.code.toUpperCase() + '</div>\
+<div class="tab_header_modified" >\
+' + data.code.toUpperCase() + ' Withdrawal Address\
+</div>\
+<input type="text" id="withdrawal_address" style="width: 300px" required="required" class="error">\
+</input>\
+<div class="tab_header_modified" >\
+Confirm Password\
+</div>\
+<input type="password" name="amount" id="withdraw_password" required="required" class="error">\
+</input>\
+<div class="tab_description">\
+Please ensure all details are correct before submitting. Every request must be confirmed by email \
+before it will be processed, most withdrawals are processed within 10 minutes of email confirmation. For \
+security reasons, larger withdrawals can take longer as they may require manual verification. \
+</div>\
+<button type="button" class="btn btn-primary" id="withdraw_button" style="margin-top: 30px; margin-bottom: 100px">Withdraw</button></div>';
+
+$('#withdraw_info').empty();
+$('#withdraw_info').append(string);
+add_withdraw_shit();
+
+
+    // $('#withdraw_button').click(function(){
+    //     console.log('yo');
+    //     amount = $('#withdraw_amount').val();
+    //     address = $('#withdrawal_address').val();
+    //     password = $('#withdraw_password').val();
+    //     coin_name = $('#select_withdraw').val();
+
+    //     if ($('#error_message').html().length > 3)
+    //     $("html, body").animate({ scrollTop: 0 }, "slow");
+
+    //     else{
+
+
+    //     email = localStorage.getItem('email');
+    //     console.log('yolo');
+    //     //alert(email);
+    //     $.ajax({
+    //       url: "/withdraw",
+    //       type: "POST",
+    //       data: {amount: amount, address: address, password: password, coin_name: coin_name},
+    //       dataType: "html"
+    //     }).done(function(data){
+    //       console.log(data);
+    //                 //alert(data);
+    //       if (data == "withdraw"){
+
+
+    //       string = '<div class="box_green"><span><span id="deposit_address">\
+    //       <span style="font-weight: bold">Success!</span><br>\
+    //       Your withdrawal request has now been added, please confirm by email and we will then process it.</span></span></div>\
+    //       </div>';
+
+    //       $('.box').before(string);        
+
+    //       $("html, body").animate({ scrollTop: 0 }, "slow");
+
+
+    //       }
+
+    //       else
+    //       alert(data);
+
+    //     });
+
+
+    //     }
+
+    //     //alert('here');
+    // });
+
+
+
+});
+});
 //$('#' + ending).attr('class', 'active');
 //$('#' + ending + '_tab').attr('class', 'tab-pane active');
 
 
 //alert('here');
+
+function add_withdraw_shit(){
     $('#withdraw_amount').on('change', function () {
+      console.log('yolo');
       withdraw_amount = $('#withdraw_amount').val();
+      coin = $('#select_withdraw').val();
+      console.log(coin);
       //alert('test');
       //alert($('#withdraw_amount').val());
       //alert($('#error_message').html());
-      withdraw_fee = .01;
+      withdraw_fee = data[coin].withdraw_fee;
 
-      if (withdraw_amount > data.available_balance){
+      if (withdraw_amount > data[coin].available_balance){
       if ($('#error_message').html().length < 3)
       $('#error_message').append('Withdraw amount must be equal to or less than your available balance.');
       }
@@ -2604,7 +3218,7 @@ else{
       }    
       else  {
       $('#error_message').empty();
-      $('#net_withdraw_amount').html(withdraw_amount - 1)
+      $('#net_withdraw_amount').html(withdraw_amount - withdraw_fee)
 
       }
   });
@@ -2614,6 +3228,7 @@ else{
         amount = $('#withdraw_amount').val();
         address = $('#withdrawal_address').val();
         password = $('#withdraw_password').val();
+        coin_name = $('#select_withdraw').val();
 
         if ($('#error_message').html().length > 3)
         $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -2625,7 +3240,7 @@ else{
         $.ajax({
           url: "/withdraw",
           type: "POST",
-          data: {amount: amount, address: address, password: password, email: email},
+          data:  {amount: amount, address: address, password: password, coin_name: coin_name},
           dataType: "html"
         }).done(function(data){
                     //alert(data);
@@ -2654,80 +3269,10 @@ else{
 
         //alert('here');
     });
-
-
-
-function generate_deposits(){
-
-      //$('#deposits_li').attr('class', 'active');
-
-    deposits = data.deposits;
-    deposit_count = deposits.length;
-
-//alert(deposits);
-
-    string = '<div class="tab_description">\
-Below is a list of deposits that you have made. Click the expander icon on the left of each row to reveal more details \
-about the deposit.<br><br>\
-To make a new deposit, please visit the Balances page and select the Deposit option under the actions menu for \
-the coin.\
-<br><br>\
-Displaying deposits 1 - ' + deposits.length + ' of ' + deposits.length +
-'</div>\
-<table class="table table-bordered">\
-        <thead>\
-          <tr>\
-            <th></th>\
-            <th>TIME</th>\
-            <th>COIN</th>\
-            <th>AMOUNT</th>\
-            <th>DEPOSIT ADDRESS</th>\
-            <th>STATUS</th>\
-          </tr>\
-        </thead><tbody>';
-
-$.each(deposits, function(key,val){
-//ticker_upper = val.coin_ticker.toUpperCase();
-var status;
-if (val.pending == false)
-  status = 'CONFIRMED';
-else
-  status = 'PENDING';
-
-    
-    time = parseInt(val.time.toString().substring(0, val.time.toString().length - 3));
-    
-    //change later 'wtf is this lol'
-    array = moment.unix(time).toArray();
-    var hi = moment.utc(array);
-        //alert(hi);
-    hi = hi.toString();
-    index = hi.indexOf('GM');
-    hi = hi.substr(0, index);
-    deposit_time = hi;
-    //end change later
-
-
-  substring = '<tr id="tab_row">\
-   <td class="expander unclicked" id="' + val.txid + '"> </td><td class="tab_td">' + deposit_time + '</td>\
-           <td class="tab_td">BTC</td>        <td class="tab_td">' + val.amount + '</td>\
-           <td class="tab_td">' + val.deposit_address + '</td> <td class="tab_td">' + status + '</td>\
-  </tr>';
-  string += substring;
-
-  });
-
-  string += '</tbody></table>'; 
-
-  //$('#below_tab_wrapper').append(string);
-
-
-
-
-
-  return string;
-
 }
+
+
+
 
   $('.expander').click(function(){
 
@@ -2902,7 +3447,11 @@ alert('Password changed!');
 });
 
 
+ add_cancel_alt_order_handler();
+
   }
+
+
 
 
 
