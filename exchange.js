@@ -284,9 +284,10 @@ var Order = new mongoose.Schema({
     start_time: Number,
     order_number: Number,
     option_type: String,
+    call_put: String,
     side: String,
     price: Number,
-    strike_price: Number,
+    strike: Number,
     quantity_original: Number,
     quantity: Number,
     quantity_left: Number,
@@ -306,6 +307,8 @@ var Order = new mongoose.Schema({
     sellers: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
     buyer_quantities: [Number],
     seller_quantities: [Number],
+    opposing_users: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
+    opposing_quantities: [Number],
     opposing_orders: [{ type: mongoose.Schema.ObjectId, ref: 'Order' }]
 });
 
@@ -816,7 +819,203 @@ if (high_price == null)
 
 
 
-res.render('trade_coins.html', {chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+res.render('trade_coins.html', {activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+
+});
+
+
+});
+});
+});
+});
+});
+});
+
+
+});
+});
+});
+
+}
+
+});
+
+
+
+
+
+
+app.get('/optmarket/:coin1/:coin2/:kind/:strike/:expiration', csrf, function(req,res){
+
+if (req.session.activated ){
+
+coin1 = req.params.coin1;
+coin2 = req.params.coin2;
+kind = req.params.kind
+strike = req.params.strike;
+expiration = req.params.expiration;
+
+coin2 = 'btc';
+
+
+//csrf = req.session._csrf;
+console.log('csrf ' + req.session._csrf);
+
+current_time = Math.floor(new Date().getTime()/1000);
+one_day_ago = current_time - (60 * 60 * 24);
+
+
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+//find all orders within past day
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+//find last order
+Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+
+Coin.findOne({code: coin1}, function(err, coin_one){
+Coin.findOne({code: coin2}, function(err, coin_two){
+User.findOne({email: req.session.user.email}).populate(coin_one.coin_name + ' ' + coin_two.coin_name).exec(function (err, coin) {
+
+console.log('yolo ' + req.session.user.email);
+
+// console.log('da coin ' + coin);
+// console.log(coin_one.coin_name);
+coin_one_balance = coin[coin_one.coin_name].available_balance;
+coin_two_balance = coin[coin_two.coin_name].available_balance;
+
+coin_one_name = coin_one.coin_name;
+coin_two_name = coin_two.coin_name;
+console.log("coin one balance " + coin_one_balance);
+console.log("coin two balance " + coin_two_balance);
+
+
+
+
+if (last_order == null){
+last_price = null;
+low_price = null;
+high_price = null;
+volume = 0;
+}
+else{
+last_price = last_order.price;
+low_price = lowest_order.price;
+high_price = highest_order.price;
+
+
+console.log('last_price ' + last_price);
+console.log('low price ' + low_price);
+console.log('high price ' + high_price);
+
+volume = 0;
+$.each(orders_within_day, function(key,val){
+
+volume += (val.quantity - val.quantity_left);
+
+});
+
+volume = volume/2;
+console.log('volume ' + volume);
+console.log('pending asks ' + pending_asks);
+console.log('pending bids ' + pending_bids);
+
+}
+
+console.log(coin1);
+console.log(coin2);
+OrderData.find({$and: [{coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
+//console.log('fucked ' + order_data);
+object = new Object();
+
+$.each(order_data, function(key,val){
+minute_grouping = Math.floor(new Date(val.time).getTime()/ (1000 * 60));
+
+
+if (object[minute_grouping] === undefined){
+    subarray = new Array();
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+else{
+    subarray = object[minute_grouping];
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+
+
+});
+
+console.log('sharray ' + JSON.stringify(object));
+
+chart_array = new Array();
+
+$.each(object, function(key,val){
+
+
+volume = 0;
+$.each(val, function(keyb,valb){
+
+volume += valb.quantity;
+if (keyb == 0){
+lowest_price = valb.price;
+highest_price = valb.price;
+open_price = valb.price;
+}
+else{
+if (valb.price > highest_price)
+    highest_price = valb.price;
+if (valb.price < lowest_price)
+    lowest_price = valb.price;
+}
+
+if (keyb == val.length -1){
+close_price = valb.price;
+}
+});
+subobject = new Object();
+subobject.low = lowest_price;
+subobject.high = highest_price;
+subobject.open = open_price;
+subobject.close = close_price;
+subobject.volume = volume;
+subobject.date = key * 1000 * 60;
+
+chart_array.push(subobject);
+
+
+});
+if (pending_asks.length == 0)
+    pending_asks = null;
+if (pending_bids.length == 0 )
+    pending_bids = null;
+
+console.log('\r\n');
+console.log(JSON.stringify(chart_array));
+console.log(volume);
+console.log(last_price);
+console.log(low_price);
+console.log(high_price);
+console.log(coin_one_name);
+console.log(coin_two_name);
+console.log(coin1);
+console.log(coin2);
+console.log(pending_asks);
+console.log(pending_bids);
+
+if (last_price == null)
+    last_price = 0;
+if (low_price == null)
+    low_price = 0;
+if (high_price == null)
+    high_price = 0;
+
+
+
+res.render('trade_options.html', {activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
 
 });
 
@@ -1870,6 +2069,982 @@ if (!complete ){
 
 
 });
+
+
+
+
+
+
+
+app.post('/buy_option',  csrf, function(req,res){
+//req.session.processing = false;
+console.log('overhere' + req.session._csrf);
+console.log(req.session.processing);
+
+if (req.session.processing == undefined)
+    req.session.processing = false;
+
+if (req.session.processing == false){
+req.session.processing = true;
+
+
+quantity = req.body.bid_quantity;
+price = req.body.bid_price;
+bid_price = price;
+bid_quantity = quantity;
+
+coin_one_name = req.body.coin_name_one;
+coin_two_name = req.body.coin_name_two;
+coin_one_ticker = req.body.coin_ticker_one
+coin_two_ticker = req.body.coin_ticker_two;
+expiration = req.body.expiration;
+strike = req.body.strike;
+call_put = req.body.call_put;
+
+//console.log('coinone' + coin_one_name);
+
+console.log('coin one ticker ' + coin_one_ticker);
+console.log('coin two ticker ' + coin_two_ticker);
+console.log('bid price ' + bid_price);
+//coin_one_ticker = 'doge';
+//coin_two_ticker = 'btc';
+//price = 100;
+//res.end('done');
+
+
+Order.find({$and: [{expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'ask'}, {pending: 'pending'}, {price: {$lte: bid_price}}]}).populate('user').sort({time: 1}).exec(function(err, ask){
+
+console.log('ask ' + ask)
+//console.log('sell ordera ' + sell_order);
+//console.log('sell orderb ' + sell_order['user']);
+//coin_name_one = coin_one_ticker + 'coin';
+
+//gets info for user that submitted the post request, and info on the relevant coins he owns
+User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function (err, coin) {
+
+//console.log('dacoin ' + coin);
+
+//Coin.findOne({code: coin_one_ticker}, function(err, coin){
+
+min_order = .00001;
+
+balance = coin[coin_two_name].balance;
+bid_value = bid_price * bid_quantity;
+
+console.log('bid ' + bid_price);
+console.log('quantity ' + bid_quantity);
+console.log('dabalance ' + balance);
+console.log('buyvalue ' + bid_value);
+
+
+if (balance >= bid_value){
+
+if (ask.length == 0 && quantity > min_order){
+
+console.log("it is in here lol");
+
+function callback(){}
+coin[coin_two_name].update({$inc: {in_orders: bid_quantity * bid_price, balance: -1 * bid_quantity * bid_price, available_balance: -1 * bid_quantity * bid_price}}, { w: 1 }, callback);
+//, in_orders_non_margin: bid_quantity * bid_price
+
+User.findOne({email: req.session.user.email}, function(err, user){
+
+order = new Order({
+                time: new Date().getTime(),
+                //last_trade_time: new Date().getTime(),
+                coin_one_ticker: coin_one_ticker,
+                coin_two_ticker: coin_two_ticker,
+                coin_one_name: coin_one_name,
+                coin_two_name: coin_two_name,
+                side: 'bid',
+                price: price,
+                quantity_original: bid_quantity,
+                quantity: quantity,
+                quantity_left: quantity,
+                user: user,
+                swap: false,
+                expiration_time: expiration,
+                strike: strike,
+                call_put: call_put
+});
+
+user.orders.push(order);
+
+
+user.save(function(err){
+
+});
+
+
+order.save(function(err){
+
+console.log('order saved');
+
+});
+
+
+
+req.session.processing = false;
+res.end(JSON.stringify('done'));
+
+//console.log(req.session.processing);
+
+
+
+
+
+});
+
+
+}
+else{
+
+console.log(coin_one_name);
+//console.log('coinfucker '  + coin);
+//console.log('fucker ' + coin[coin_two_name].balance);
+
+balance = coin[coin_one_name].balance;
+bid_value = bid_price * bid_quantity
+bid_value_left = bid_value;
+bid_quantity_left = bid_quantity;
+
+console.log('buy quantity lefta ' + bid_quantity_left);
+
+complete = false;
+
+total = 0;
+
+
+
+$.each(ask, function(key,val){
+ask_value = val.price * val.quantity_left;
+ask_order_id = val._id;
+ask_price = val.price;
+ask_quantity_left = val.quantity_left;
+
+(function(ask_value, ask_order_id, ask_price, ask_quantity_left, key){
+if (!complete ){
+    if (ask_quantity_left >= bid_quantity_left){
+        quantity_left = ask_quantity_left - bid_quantity_left;
+        //update sell order
+
+        if (ask_quantity_left == bid_quantity_left)
+            Order.findByIdAndUpdate(ask_order_id, {$set: {quantity_left: quantity_left, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
+
+            });
+        else
+            Order.findByIdAndUpdate(ask_order_id, {$set: {quantity_left: quantity_left, last_trade_time: new Date().getTime()}}, function(err, order){
+
+            });
+
+        //create buy order record and update balance
+        User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+        //buy_quantity_left = buy_value_left / buy_price;
+
+
+        //update buyer balance
+        purchase_cost = bid_quantity_left * val.price;
+
+        console.log('buy quantity left ' + key + ' ' + bid_quantity_left);
+        console.log('purchase cost ' + key + ' ' + ask_value);
+
+        //user[coin_one_name].update({$inc: {available_balance: bid_quantity_left, balance: bid_quantity_left}}, { w: 1 }, callback);
+        user[coin_two_name].update({$inc: { available_balance: -1 * purchase_cost, balance: -1 * purchase_cost}}, { w: 1 }, callback);
+
+        function callback(){}
+        //done updating buyer balance
+
+        time = new Date().getTime();
+        order = new Order({
+                        time: time,
+                        //last_trade_time: new Date().getTime(),
+                        coin_one_ticker: coin_one_ticker,
+                        coin_two_ticker: coin_two_ticker,
+                        coin_one_name: coin_one_name,
+                        coin_two_name: coin_two_name,
+                        side: 'bid',
+                        price: bid_price,
+                        quantity_original: bid_quantity,
+                        quantity: bid_quantity,
+                        quantity_left: 0,
+                        user: user,
+                        pending: 'complete',
+                        swap: false,
+                        expiration_time: expiration,
+                        strike: strike,
+                        call_put: call_put
+        });
+
+        //add opposing orders and users to newly created order 
+        $.each(ask, function(keyb, valb){
+        if (keyb <= key){
+        order.opposing_orders.push(valb);
+        order.opposing_users.push(valb.user);
+        
+        if (keyb == key)
+            order.opposing_quantities.push(bid_quantity_left);
+        else
+            order.opposing_quantities.push(valb.quantity_left);
+
+        }
+        });
+
+        //add opposing orders to opposing orders
+        $.each(ask, function(keyb, valb){
+
+            valb.opposing_orders.push(order);
+            valb.opposing_users.push(user);
+
+            if (keyb == key)
+                valb.opposing_quantities.push(bid_quantity_left);
+            else
+                valb.opposing_quantities.push(valb.quantity_left);
+
+            valb.save();
+
+        });    
+
+
+
+        order_data = new OrderData({
+                            time: time,
+                            coin_ticker_one: coin_one_ticker,
+                            coin_ticker_two: coin_two_ticker,
+                            price: ask_price,
+                            quantity: bid_quantity
+        });
+
+        order_data.save(function(err){
+
+        });
+
+        user.orders.push(order);
+
+
+        user.save(function(err){
+
+        });
+
+
+        order.save(function(err){
+
+        // req.session.processing = false;
+        // res.end('done');
+
+        console.log('order saved');
+
+        });
+
+        });
+
+        //update balance on seller
+
+
+        // Order.findByIdAndUpdate(ask_order_id, {$inc: {quantity_left: }}, function(err, order){
+
+
+        // });
+
+
+
+
+        //console.log('sell order user ' + sell_order);
+        User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, seller){
+            //console.log('dasell ' + seller);
+            console.log('buy quantity left ' + bid_quantity_left);
+            console.log('buy value left ' + bid_value_left);
+
+            seller[coin_one_name].update({$inc: {in_orders: -1 * bid_quantity_left,  in_positions: bid_quantity_left}}, { w: 1 }, function(err){
+
+                purchase_cost = bid_quantity_left * val.price;
+                seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * purchase_cost, available_balance: purchase_cost, balance: purchase_cost}}, { w: 1 }, function(err){
+
+                    req.session.processing = false;
+                    res.end('done');
+
+                });
+
+            });
+
+
+
+        });
+
+
+        complete = true;
+    }
+    else{
+        //if sell quantity is less than the buy quantity
+        console.log('shit is in elseb');
+
+        //quantity_left = (sell_value - buy_value_left)/sell_price;
+        //update sell order
+        bid_quantity_left -= ask_quantity_left;
+
+        Order.findByIdAndUpdate(ask_order_id, {$set: {quantity_left: 0, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
+
+            console.log('fucking error ' + err);
+
+        });
+
+        //create buy order record and update balance
+        User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+            console.log(' fucking error 2 ' + err);
+ 
+        function callback(){}
+
+        console.log('sell quantity left ' + key + ' ' + ask_quantity_left);
+        console.log('sell value ' + key + ' ' + ask_value);
+        console.log('bid quantity left ' + key + ' ' + bid_quantity_left);
+        //update buyer balance
+        //user[coin_one_name].update({$inc: {available_balance: ask_quantity_left, balance: ask_quantity_left}}, { w: 1 }, callback);
+        user[coin_two_name].update({$inc: { available_balance: -1 * ask_value, balance: -1 * ask_value}}, { w: 1 }, callback);
+        //done updating buyer balance
+
+        time = new Date().getTime();
+
+        order_data = new OrderData({
+                            time: time,
+                            coin_ticker_one: coin_one_ticker,
+                            coin_ticker_two: coin_two_ticker,
+                            price: ask_price,
+                            quantity: ask_quantity_left
+        });
+
+        order_data.save(function(err){
+
+        });
+
+
+
+        if (key == ask.length -1 ){
+
+            function callback(err){ console.log('errorhi ' + err)}
+            console.log('ovahere ' + user[coin_two_name]);
+
+            user[coin_two_name].update({$inc: {in_orders: bid_quantity_left * bid_price, available_balance: -1 * bid_quantity_left * bid_price, balance: -1 * bid_quantity_left * bid_price}}, { w: 1 }, callback);
+
+            order = new Order({
+                    time: time,
+                    last_trade_time: new Date().getTime(),
+                    coin_one_ticker: coin_one_ticker,
+                    coin_two_ticker: coin_two_ticker,
+                    coin_one_name: coin_one_name,
+                    coin_two_name: coin_two_name,
+                    side: 'bid',
+                    price: bid_price,
+                    quantity_original: bid_quantity,
+                    quantity: bid_quantity,
+                    quantity_left: bid_quantity_left,
+                    user: user,
+                    pending: 'pending',
+                    swap: false,
+                    expiration_time: expiration,
+                    strike: strike,
+                    call_put: call_put
+            });
+
+
+                $.each(ask, function(keyb, valb){
+                if (keyb <= key){
+                order.opposing_orders.push(valb);
+                order.opposing_users.push(valb.user);
+                order.opposing_quantities.push(valb.quantity_left);
+
+                }
+                });
+
+                //add opposing orders to opposing orders
+                $.each(ask, function(keyb, valb){
+
+                    valb.opposing_orders.push(order);
+                    valb.opposing_users.push(user);
+                    valb.opposing_quantities.push(valb.quantity_left);
+                    valb.save();
+
+                });    
+
+
+
+
+            user.orders.push(order);
+
+
+            user.save(function(err){
+
+            });
+
+
+            order.save(function(err){
+
+            console.log('order saved');
+
+            });
+
+
+        }
+
+
+
+        });
+
+
+
+
+        //update opposing order;
+        //val.update({$inc: {quantity_left: -1 * ask_quantity_left}, $set: {pending: 'complete'}});
+
+
+        //update balance on seller
+        // User.findOne(val['user']).populate({
+        //   path: 'orders',
+        //   match: { $and: [{swap: false}, {expiration: expiration}, {strike: strike}, {coin_one_name: coin_one_name}] },
+        //   //select: 'orders',
+        // }).select('orders').exec(function(err, orders){
+
+        // order = orders['orders'][0];
+        // console.log(order);
+
+
+
+
+
+        // });
+
+
+
+        //update balance on seller
+        User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, seller){
+            seller[coin_one_name].update({$inc: {in_orders: -1 * ask_quantity_left, in_positions: ask_quantity_left}}, { w: 1 }, function(err){
+
+                seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * ask_value, available_balance: ask_value, balance: ask_value}}, { w: 1 }, function(err){
+
+                    req.session.processing = false;
+                    res.end('done');
+                });
+
+            });
+
+
+        });
+
+
+    }
+
+
+
+
+
+
+}
+}(ask_value, ask_order_id, ask_price, ask_quantity_left, key));
+
+
+});
+
+
+
+}
+
+
+
+
+}
+});
+
+
+});
+
+}
+
+});
+
+Order.find({}, function(err, orders){
+
+$.each(orders, function(key, val){
+
+//console.log('yolo here ' + val);
+
+if (val.time == 1403335309229){
+
+//val.update({$set: {quantity: 1}}, function(err, val){});
+
+
+}
+
+
+
+});
+
+});
+
+
+app.post('/sell_option', csrf, function(req,res){
+
+
+
+console.log( 'ask + \r\n')
+
+if (req.session.processing_sell == undefined)
+    req.session.processing_sell = false;
+
+if (req.session.processing_sell == false){
+req.session.processing_sell = true;
+
+ask_quantity = parseFloat(req.body.ask_quantity);
+ask_price = parseFloat(req.body.ask_price);
+console.log(' ap ' + ask_price);
+
+coin_one_name = req.body.coin_name_one;
+coin_two_name = req.body.coin_name_two;
+coin_one_ticker = req.body.coin_ticker_one
+coin_two_ticker = req.body.coin_ticker_two;
+expiration = req.body.expiration;
+strike = req.body.strike;
+call_put = req.body.call_put;
+margin = parseFloat(req.body.margin);
+
+console.log('coinone' + coin_one_name);
+
+console.log('coin one ticker ' + coin_one_ticker);
+console.log(coin_two_ticker);
+//coin_one_ticker = 'doge';
+//coin_two_ticker = 'btc';
+//price = 100;
+
+Order.find({$and: [{expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'bid'}, {pending: 'pending'}, {price: {$gte: ask_price}}]}).populate('user').sort({time: 1}).exec(function(err, bid){
+
+//console.log('sell ordera ' + sell_order);
+//console.log('sell orderb ' + sell_order['user']);
+//coin_name_one = coin_one_ticker + 'coin';
+
+//gets info for user that submitted the post request, and info on the relevant coins he owns
+User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function (err, coin) {
+
+//console.log('dacoin ' + coin);
+
+//Coin.findOne({code: coin_one_ticker}, function(err, coin){
+min_order = .00001;
+
+balance = coin[coin_one_name].balance;
+ask_value = ask_price * ask_quantity;
+total =  margin;
+
+console.log('bid ' + ask_price);
+console.log('quantity ' + ask_quantity);
+console.log('dabalance ' + balance);
+console.log('buyvalue ' + ask_value);
+
+
+if (balance >= total){
+console.log('inside');
+
+if (bid.length == 0 && ask_quantity > min_order){
+
+function callback(){}
+coin[coin_one_name].update({$inc: {available_balance: -1 * total, balance: -1 * total, in_orders: margin}}, { w: 1 }, callback);
+coin[coin_two_name].update({$inc: {in_orders_non_margin: ask_value}}, { w: 1 }, callback);
+
+
+console.log("it is in here lol");
+
+User.findOne({email: req.session.user.email}, function(err, user){
+
+
+
+order = new Order({
+                time: new Date().getTime(),
+                coin_one_ticker: coin_one_ticker,
+                coin_two_ticker: coin_two_ticker,
+                coin_one_name: coin_one_name,
+                coin_two_name: coin_two_name,
+                side: 'ask',
+                price: ask_price,
+                quantity_original: ask_quantity,
+                quantity: ask_quantity,
+                quantity_left: ask_quantity,
+                user: user,
+                swap: false,
+                expiration_time: expiration,
+                strike: strike,
+                call_put: call_put,
+                initial_margin: margin
+});
+
+user.orders.push(order);
+
+
+user.save(function(err){
+
+});
+
+
+order.save(function(err){
+
+console.log('order saved');
+
+});
+
+req.session.processing_sell = false;
+res.end('done');
+
+});
+
+}
+else{
+
+console.log(coin_one_name);
+//console.log('coinfucker '  + coin);
+console.log('fucker ' + coin[coin_two_name].balance);
+
+
+
+ask_value_left = ask_value;
+ask_quantity_left = ask_quantity;
+
+//console.log('sell quantity lefta ' + key + ' ' + ask_quantity_left);
+
+complete = false;
+
+total = 0;
+
+console.log('orignal ask quantity left ' + ask_quantity_left);
+
+$.each(bid, function(key,val){
+bid_value = val.price * val.quantity_left;
+bid_order_id = val._id;
+bid_price = val.price;
+bid_quantity_left = val.quantity_left;
+
+
+(function(bid_value, bid_order_id, bid_price, bid_quantity_left, key){
+
+console.log('here ask quantity left ' + key + ' ' + ask_quantity_left);
+
+
+if (!complete ){
+console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
+    if (bid_quantity_left >= ask_quantity_left){
+        quantity_left = bid_quantity_left - ask_quantity_left;
+        console.log('bid quantity leftb ' + key + ' ' + bid_quantity_left);
+        //update bid order
+        console.log('yoloa '  + key + ' ' + ask_quantity_left);
+        if (bid_quantity_left == ask_quantity_left)
+            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: quantity_left, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
+
+            });
+        else
+            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: quantity_left, last_trade_time: new Date().getTime()}}, function(err, order){
+
+            });
+
+        //create ask order record and update balance
+        User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+        //buy_quantity_left = buy_value_left / buy_price;
+
+
+        //update askers balance
+        sell_price = ask_quantity_left * bid_price;
+
+        console.log('bid price ' + bid_price);
+        console.log('bid quantity leftb ' + bid_quantity_left );
+        console.log('yolob '  + key + ' ' + sell_price);
+        //console.log('sell price ' + key + ' ' + sell _price);
+
+        user[coin_one_name].update({$inc: {in_positions: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left}}, { w: 1 }, callback);
+        user[coin_two_name].update({$inc: {available_balance: sell_price, balance: sell_price}}, { w: 1 }, callback);
+
+        function callback(){}
+        //done updating buyer balance
+
+        time = new Date().getTime();
+
+        order = new Order({
+                        time: time,
+                        coin_one_ticker: coin_one_ticker,
+                        coin_two_ticker: coin_two_ticker,
+                        coin_one_name: coin_one_name,
+                        coin_two_name: coin_two_name,
+                        side: 'ask',
+                        price: ask_price,
+                        quantity_original: ask_quantity,
+                        quantity: ask_quantity,
+                        quantity_left: 0,
+                        user: user,
+                        pending: 'complete',
+                        swap: false,
+                        expiration_time: expiration,
+                        strike: strike,
+                        call_put: call_put
+        });
+
+
+        //add opposing orders and users to newly created order 
+        $.each(ask, function(keyb, valb){
+        if (keyb <= key){
+        order.opposing_orders.push(valb);
+        order.opposing_users.push(valb.user);
+        
+        if (keyb == key)
+            order.opposing_quantities.push(bid_quantity_left);
+        else
+            order.opposing_quantities.push(valb.quantity_left);
+
+        }
+        });
+
+        //add opposing orders to opposing orders
+        $.each(ask, function(keyb, valb){
+
+            valb.opposing_orders.push(order);
+            valb.opposing_users.push(user);
+
+            if (keyb == key)
+                valb.opposing_quantities.push(bid_quantity_left);
+            else
+                valb.opposing_quantities.push(valb.quantity_left);
+
+            valb.save();
+
+        });    
+
+        order_data = new OrderData({
+                            time: time,
+                            coin_ticker_one: coin_one_ticker,
+                            coin_ticker_two: coin_two_ticker,
+                            price: bid_price,
+                            quantity: ask_quantity
+        });
+
+        order_data.save(function(err){
+
+        });
+
+
+        user.orders.push(order);
+
+
+        user.save(function(err){
+
+        });
+
+        order.save(function(err){
+
+        console.log('order saved');
+        req.session.processing_sell = false;
+        res.end('done');
+
+        });
+
+        });
+
+        //update balance on buyer
+
+
+
+
+
+        //console.log('sell order user ' + sell_order);
+        //User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
+            //console.log('dabuy ' + buyer);
+            //console.log('buy quantity left ' + bid_quantity_left);
+            //console.log('buy value left ' + ask_value_left);
+
+            // buyer[coin_one_name].update({$inc: {available_balance: ask_quantity_left, balance: ask_quantity_left}}, { w: 1 }, function(err){
+
+            //     buy_price = ask_quantity_left * bid_price;
+            //     buyer[coin_two_name].update({$inc: {balance: -1 * buy_price, in_orders_non_margin: -1 * buy_price}}, { w: 1 }, function(err){
+                    // req.session.processing_sell = false;
+                    // res.end('done');
+            //     });
+
+            // });
+
+
+
+        //});
+
+
+        complete = true;
+    }
+    else{
+        //if bid quantity is less than the ask quantity
+        console.log('shit is in elseb');
+
+        //quantity_left = (sell_value - buy_value_left)/sell_price;
+        //update bid order
+        //console.log('bid quantity lefta ' + key + ' ' + bid_quantity_left);
+
+        ask_quantity_left -= bid_quantity_left;
+        console.log('elsea ask quantity left ' + key + ' ' + ask_quantity_left);
+
+        Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: 0, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
+
+        });
+
+        //update balance for user that submitted ask order
+        User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+        function callback(){}
+
+
+
+        console.log('elseb ask quantity left ' + key + ' ' + ask_quantity_left);
+
+        sell_price = bid_quantity_left * bid_price;
+
+
+        console.log('bid quantity leftai ' + key + ' ' + bid_quantity_left);
+
+        console.log('bid quantity left ' + bid_quantity_left);
+        console.log('bid price ' + bid_price);
+        console.log('sell price ' + sell_price);
+
+        //update asker's balance
+        user[coin_one_name].update({$inc: {in_positions: bid_quantity_left, available_balance: -1 * bid_quantity_left, balance: -1 * bid_quantity_left}}, { w: 1 }, callback);
+        user[coin_two_name].update({$inc: {available_balance: sell_price, balance: sell_price}}, { w: 1 }, callback);
+        //done updating  asker's balance
+
+        time = new Date().getTime();
+
+
+        order_data = new OrderData({
+                            time: time,
+                            coin_ticker_one: coin_one_ticker,
+                            coin_ticker_two: coin_two_ticker,
+                            price: bid_price,
+                            quantity: bid_quantity_left
+        });
+
+        order_data.save(function(err){
+
+        });
+
+
+        //create ask order after processing last bid
+        if (key == bid.length -1 ){
+
+
+            function callback(err){ console.log('errorhi ' + err)}
+            console.log('ovahere ' + user[coin_two_name]);
+
+            user[coin_one_name].update({$inc: {in_orders: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left }}, { w: 1 }, callback);
+            user[coin_two_name].update({$inc: {in_orders_non_margin: ask_quantity_left * ask_price}}, { w: 1 }, callback);
+
+
+            order = new Order({
+                    time: time,
+                    coin_one_ticker: coin_one_ticker,
+                    coin_two_ticker: coin_two_ticker,
+                    coin_one_name: coin_one_name,
+                    coin_two_name: coin_two_name,
+                    side: 'ask',
+                    price: ask_price,
+                    quantity_original: ask_quantity,
+                    quantity: ask_quantity,
+                    quantity_left: ask_quantity_left,
+                    user: user,
+                    pending: 'pending',
+                    swap: false,
+                    expiration_time: expiration,
+                    strike: strike,
+                    call_put: call_put
+            });
+
+                $.each(ask, function(keyb, valb){
+                if (keyb <= key){
+                order.opposing_orders.push(valb);
+                order.opposing_users.push(valb.user);
+                order.opposing_quantities.push(valb.quantity_left);
+
+                }
+                });
+
+                //add opposing orders to opposing orders
+                $.each(ask, function(keyb, valb){
+
+                    valb.opposing_orders.push(order);
+                    valb.opposing_users.push(user);
+                    valb.opposing_quantities.push(valb.quantity_left);
+                    valb.save();
+
+                });    
+
+
+            user.orders.push(order);
+
+            user.save(function(err){
+
+            });
+
+
+            order.save(function(err){
+
+            console.log('order saved');
+            req.session.processing_sell = false;
+            res.end('done');
+
+            });
+
+
+        }
+
+
+
+        });
+
+        //update balance on bidder
+        //User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
+            // buyer[coin_one_name].update({$inc: {available_balance: bid_quantity_left, balance: bid_quantity_left}}, { w: 1 }, function(err){
+
+            //     //sell_price = bid_quantity_left * bid_price;
+            //     buyer[coin_two_name].update({$inc: {in_orders_non_margin: -1 * sell_price, balance: -1 * sell_price}}, { w: 1 }, function(err){
+                    // req.session.processing_sell = false;
+                    // res.end('done');
+            //     });
+
+            // });
+
+
+        //});
+
+
+    }
+
+
+
+
+
+}
+}(bid_value, bid_order_id, bid_price, bid_quantity_left, key));
+
+});
+
+
+
+}
+
+
+
+
+}
+});
+
+
+});
+
+}
+
+
+
+
+});
+
+
+
 
 
 app.post('/buy_swap',  csrf, function(req,res){
@@ -4759,24 +5934,10 @@ app.post('/cancel_order', function(req,res){
 
 console.log(req.body.order_id);
 
-
-
-Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'cancelled'}}).populate('buyer seller').exec(function(err, order){
-
-console.log(order);
-
-function callback(){}
-
-if (order.side == 'bid')
-order.buyer.update({$inc: {maintenance_margin: -1 * order.initial_margin, in_orders: -1 * order.initial_margin , in_orders_non_margin: order.price * order.quantity, available_balance: order.initial_margin + (order.price * order.quantity)}}, { w: 1 }, callback);
-else if (order.side == 'ask')
-order.seller.update({$inc: {maintenance_margin: -1 * order.initial_margin, in_orders: -1 * order.initial_margin , in_orders_non_margin: -1 * order.price * order.quantity, available_balance: order.initial_margin}}, { w: 1 }, callback);
-
+Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'cancelled'}}, function(err, order){
 
 console.log("order cancelled");
 res.end("done");
-
-
 });
 
 
@@ -4803,41 +5964,41 @@ app.post('/exercise_option', function(req,res){
 
 //console.log(req.body.order_id);
 Order.findByIdAndUpdate(req.body.order_id, { $set: {pending: 'exercised'}}).populate('opposing_orders').exec( function(err, order){
-console.log(order._id);
-bid_total_quantity = order.quantity;
+// console.log(order._id);
+// bid_total_quantity = order.quantity;
 
-ask_total = 0;
-$.each(order.opposing_orders, function(key, val){
+// ask_total = 0;
+// $.each(order.opposing_orders, function(key, val){
 
-if (key != order.opposing_orders.length-1 ){
-    //console.log(key);
-    ask_total += val.quantity;
-    console.log(val.quantity);
+// if (key != order.opposing_orders.length-1 ){
+//     //console.log(key);
+//     ask_total += val.quantity;
+//     console.log(val.quantity);
 
-Order.findByIdAndUpdate(val._id, { $set: {pending: 'exercised'}}, function(err, order){
-
-
-});
+// Order.findByIdAndUpdate(val._id, { $set: {pending: 'exercised'}}, function(err, order){
 
 
-
-}
-else{
-    //console.log('hi ' + key);
-    console.log('here ' + ask_total);
-left = bid_total_quantity - ask_total;
-console.log(left);
-
-Order.findByIdAndUpdate(val._id, {$inc: {quantity: -1 * left}}, function(err, order){
+// });
 
 
-});
+
+// }
+// else{
+//     //console.log('hi ' + key);
+//     console.log('here ' + ask_total);
+// left = bid_total_quantity - ask_total;
+// console.log(left);
+
+// Order.findByIdAndUpdate(val._id, {$inc: {quantity: -1 * left}}, function(err, order){
 
 
-}
+// });
 
 
-});
+// }
+
+
+// });
 
 
 });

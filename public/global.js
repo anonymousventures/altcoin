@@ -6,7 +6,7 @@ else
   prefix = 'http://genesisblock.io/';
 
 
-if (document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
+if ( document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
 
 
 if (activated){
@@ -1342,6 +1342,7 @@ string += '</tbody></table><br><br>';
         <thead>\
           <tr>\
             <th>ORDER ID</th>\
+            <th>CALL / PUT</th>\
             <th>TYPE</th>\
             <th>OPTION NAME</th>\
             <th>TIME</th>\
@@ -1364,7 +1365,7 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
 
-if (val.pending == 'pending' && val.swap != true){
+if (val.pending == 'pending' && val.swap == false){
 
 //if ( (val.pending == 'pending' || val.pending == 'complete') && val.quantity_left != 0){
 
@@ -1373,6 +1374,8 @@ if (val.side == 'ask')
   type = 'SELL';
 else
   type = 'BUY';
+
+
 
 
     
@@ -1390,14 +1393,15 @@ console.log(val._id);
 console.log(val);
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + val.call_put + '</td>\
         <td class="tab_td_order">' + type + '</td>\
-        <td class="tab_td_order">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + 'BTC' + '/' + val.strike + '/<br>' + val.expiration_time  +'</td>\
         <td class="tab_td_order">' + order_time + '</td>\
-        <td class="tab_td_order">' + (val.price).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">' + val.price  + '</td>\
         <td class="tab_td_order">' + (val.quantity_left).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + (val.quantity_left * val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + '.015' + '</td>\
-        <td class="tab_td_order">' + (parseFloat(val.quantity_left) * parseFloat(val.price) * 1.015).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">' + ((val.quantity_left) * val.price  ).toPrecision(5) + '</td>\
+        <td class="tab_td_order">0.0000000</td>\
+        <td class="tab_td_order">' + ((val.quantity_left) * val.price  ).toPrecision(5)  + '</td>\
         <td class="tab_td_order">\
         <a class="cancel_order" href="#" order_id="' + val._id + '">\
         <img src="' + prefix + 'img/delete.png"  alt="Cancel" class="2x" width="16" style="margin-left: 14px"><br>  Cancel </a>\
@@ -1538,6 +1542,7 @@ Displaying orders 1 - ' + length + ' of ' + length +
         <thead>\
           <tr>\
             <th>ORDER ID</th>\
+            <th>PUT / CALL</th>\
             <th>TYPE</th>\
             <th>OPTION NAME</th>\
             <th>TIME</th>\
@@ -1546,7 +1551,6 @@ Displaying orders 1 - ' + length + ' of ' + length +
             <th>TOTAL</th>\
             <th>FEE</th>\
             <th>NET TOTAL</th>\
-            <th>NET VARIATION MARGIN</th>\
             <th>STATUS</th>\
           </tr>\
         </thead><tbody>';
@@ -1562,14 +1566,17 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
   //console.log('ah ' + JSON.stringify(val));
-if (val.swap != true){
-if ( val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left)) || val.pending == 'exercised' || val.pending == 'expired'){
+if (val.swap == false){
+if ( val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left)) || val.pending == 'exercised' || val.pending == 'expired' || (val.pending == 'cancelled' && val.quantity != val.quantity_left)){
 
   //console.log('ah ' + JSON.stringify(val));
 if (val.side == 'ask')
   type = 'SELL';
 else
   type = 'BUY';
+
+var status;
+
 
 
     
@@ -1588,25 +1595,25 @@ processed = val.quantity - val.quantity_left;
 //var status = '';
 
 
-if (val.pending == 'complete' || val.pending == 'pending')
+if (val.pending == 'complete' || val.pending == 'pending' || val.pending == 'cancelled')
 status = 'NOT EXERCISED YET';
 else if (val.pending == 'expired')
-status = 'STRIKED OUT';
+status = 'EXPIRED';
 else status = 'EXERCISED';
 
 
-if (val.quantity == val.quantity_original || val.side == 'bid'){
+if ( (val.quantity == val.quantity_original || val.side == 'bid')  && val.swap == false ){
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + val.call_put + '</td>\
         <td class="tab_td_order">' + type + '</td>\
-        <td class="tab_td_order">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + 'BTC/' + val.call_put + '/<br>' + val.expiration_time + '</td>\
         <td class="tab_td_order">' + order_time + '</td>\
         <td class="tab_td_order">' + (val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + processed.toPrecision(5)   + '</td>\
-        <td class="tab_td_order">' + (processed  * val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + '.015' + '</td>\
-        <td class="tab_td_order">' + (parseFloat(processed ) * parseFloat(val.price) * 1.015).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + val.net_variation.toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + (val.quantity - val.quantity_left).toPrecision(5)   + '</td>\
+        <td class="tab_td_order">' + (val.price * (val.quantity - val.quantity_left)).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">0.0000</td>\
+        <td class="tab_td_order">' + (val.price * (val.quantity - val.quantity_left)).toPrecision(5) + '</td>\
         <td class="tab_td_order">' + status + '</td>\
 </tr>';
 string += substring;
@@ -1618,28 +1625,30 @@ unexercised_amount = parseFloat(val.quantity) - parseFloat(val.quantity_left);
 
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + val.call_put + '</td>\
         <td class="tab_td_order">' + type + '</td>\
-        <td class="tab_td_order">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + 'BTC/' + val.call_put + '/<br>' + val.expiration_time + '</td>\
         <td class="tab_td_order">' + order_time + '</td>\
         <td class="tab_td_order">' + (val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + exercised_amount.toPrecision(5)   + '</td>\
-        <td class="tab_td_order">' + (exercised_amount  * val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + '.015' + '</td>\
-        <td class="tab_td_order">' + (parseFloat(exercised_amount ) * parseFloat(val.price) * 1.015).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + val.net_variation.toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + val.quantity.toPrecision(5)   + '</td>\
+        <td class="tab_td_order">' + (val.price * val.quantity).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">0.0000</td>\
+        <td class="tab_td_order">' + (val.price * val.quantity).toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + status + '</td>\
         <td class="tab_td_order">EXERCISED 1</td>\
 </tr>\
 <tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + val.call_put + '</td>\
         <td class="tab_td_order">' + type + '</td>\
-        <td class="tab_td_order">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + 'BTC/' + val.call_put + '/<br>' + val.expiration_time + '</td>\
         <td class="tab_td_order">' + order_time + '</td>\
         <td class="tab_td_order">' + (val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + unexercised_amount.toPrecision(5)   + '</td>\
-        <td class="tab_td_order">' + (unexercised_amount  * val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + '.015' + '</td>\
-        <td class="tab_td_order">' + (parseFloat(unexercised_amount) * parseFloat(val.price) * 1.015).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + val.net_variation.toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + val.quantity.toPrecision(5)   + '</td>\
+        <td class="tab_td_order">' + (val.price * val.quantity).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">0.0000</td>\
+        <td class="tab_td_order">' + (val.price * val.quantity).toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + status + '</td>\
         <td class="tab_td_order">NOT EXERCISED YET 1 </td>\
 </tr>';
 
@@ -1660,91 +1669,6 @@ string += substring;
 string += '</tbody></table>'; 
 
 
-
-//second part of table
-
-    string += '<div class="tab_header">\
-Variation Margin\
-</div>\
-<div class="tab_description">\
-Below is a list of variation margin changes to the completed orders that you have made. \
-Any pending orders will show up under \'Your Orders\'. <br><br>\
-Displaying orders 1 - ' + length + ' of ' + length +
-'</div>\
-<table class="table table-bordered">\
-        <thead>\
-          <tr>\
-            <th>ORDER ID</th>\
-            <th>TYPE</th>\
-            <th>OPTION NAME</th>\
-            <th>TIME</th>\
-            <th>VARIATION MARGIN</th>\
-          </tr>\
-        </thead><tbody>';
-
-
-function predicatBy(prop){
-   return function(a,b){
-      if( a[prop] > b[prop]){
-          return 1;
-      }else if( a[prop] < b[prop] ){
-          return -1;
-      }
-      return 0;
-   }
-}
-
-
-
-if (orders_populated != null){
-$.each(orders_populated, function(keyb, valb){
-
-valb = valb[0];
-//console.log('here ' + JSON.stringify(valb.variation_margin));
-valb.variation_margin = valb.variation_margin.sort( predicatBy("time") );
-
-
-
-$.each(valb.variation_margin, function(keyc, valc){
-
-    
-    time = parseInt(valc.time.toString().substring(0, valc.time.toString().length - 3));
-    
-    array = moment.unix(time).toArray();
-    var hi = moment.utc(array);
-        //alert(hi);
-    hi = hi.toString();
-    index = hi.indexOf('GM');
-    hi = hi.substr(0, index);
-    variation_time = hi;
-
-
-
-substring = '<tr id="tab_row">\
-        <td class="tab_td_order">' + valb._id + '</td>\
-        <td class="tab_td_order">' + valb.side + '</td>\
-        <td class="tab_td_order">' + valb.short_symbol + '</td>\
-        <td class="tab_td_order">' + variation_time+ '</td>\
-        <td class="tab_td_order">' + valc.amount + '</td>\
-</tr>';
-//console.log('ugh ' + JSON.stringify(valc.time));
-
-string += substring; 
-
-});
-
-}); 
-}
-
-
-
-
-
-
-
-
-
-string += '</tbody></table>'; 
 
 
 
@@ -1788,6 +1712,7 @@ Displaying options 1 - ' + length + ' of ' + length +
         <thead>\
           <tr>\
             <th>ORDER ID</th>\
+            <th>PUT / CALL</th>\
             <th>TYPE</th>\
             <th>OPTION NAME</th>\
             <th>TIME</th>\
@@ -1796,7 +1721,6 @@ Displaying options 1 - ' + length + ' of ' + length +
             <th>TOTAL</th>\
             <th>FEE</th>\
             <th>NET TOTAL</th>\
-            <th>NET VARIATION MARGIN</th>\
             <th></th>\
           </tr>\
         </thead><tbody>';
@@ -1812,7 +1736,7 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
   //console.log('ah ' + JSON.stringify(val));
-if (val.swap != true && (val.side == 'bid' && val.pending == 'complete' || (val.pending == 'pending' && (val.quantity != val.quantity_left))) ){
+if (val.swap == false && (val.side == 'bid' && val.pending == 'complete' || (val.pending == 'cancelled' && val.quantity != val.quantity_left) || (val.pending == 'pending' && (val.quantity != val.quantity_left))) ){
 
   //console.log('ah ' + JSON.stringify(val));
 if (val.side == 'ask')
@@ -1837,15 +1761,15 @@ processed = val.quantity - val.quantity_left;
 
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
+        <td class="tab_td_order">' + val.call_put + '</td>\
         <td class="tab_td_order">' + type + '</td>\
-        <td class="tab_td_order">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + 'BTC/' + val.call_put + '/<br>' + val.expiration_time + '</td>\
         <td class="tab_td_order">' + order_time + '</td>\
         <td class="tab_td_order">' + (val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + processed.toPrecision(5)   + '</td>\
-        <td class="tab_td_order">' + (processed  * val.price).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + '.015' + '</td>\
-        <td class="tab_td_order">' + (parseFloat(processed ) * parseFloat(val.price) * 1.015).toPrecision(5)  + '</td>\
-        <td class="tab_td_order">' + val.net_variation.toPrecision(5) + '</td>\
+        <td class="tab_td_order">' + (val.quantity - val.quantity_left).toPrecision(5)   + '</td>\
+        <td class="tab_td_order">' + (val.price * (val.quantity - val.quantity_left)).toPrecision(5)  + '</td>\
+        <td class="tab_td_order">0.0000</td>\
+        <td class="tab_td_order">' + (val.price * (val.quantity - val.quantity_left)).toPrecision(5) + '</td>\
         <td class="tab_td_order"><a class="exercise_option" href="#" order_id="' + val._id + '">        <img src="' + prefix + 'img/check.png" alt="Exercise" class="2x" width="16" style="margin-left: 20px"><br>  Exercise </a></td>\
 </tr>';
 string += substring;
@@ -1948,21 +1872,11 @@ string += '</tbody></table>';
 $('#below_tab_wrapper').append(string);
 
 
-$('.cancel_order').click(function(){
 
-order_id = $(this).attr('order_id');
-      $.ajax({
-        url: "/cancel_order",
-        type: "POST",
-        data: {order_id: order_id, _csrf: csrf},
-        dataType: "html"
-      }).done(function(data){
 
-        alert(data);
+add_cancel_order_handler();
 
-      });
 
-    });
 
 
 
@@ -2158,23 +2072,202 @@ add_order_handlers();
 
 
 
+if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket') == -1 ){
 
-  if (document.URL.indexOf('market') != -1 && document.URL.indexOf('altmarket') == -1 ){
-console.log('fucker');
-/*
-available_balance = {{{available_balance}}};
-contract = {{{contract}}};
-chart_info = {{{chart_info}}};
-csrf = {{{csrf}}};
-volume = {{{volume}}};
-last_price = {{{last_price}}};
-low_price = {{{low_price}}};
-high_price = {{{high_price}}};
-pending_asks = {{{pending_asks}}};
-pending_bids = {{{pending_bids}}};
-*/
-//get expiration time
- // alert(contract.expiration_time);
+
+    coin_one_ticker_upper = coin_one_ticker.toUpperCase();
+    coin_two_ticker_upper = coin_two_ticker.toUpperCase();
+
+    coin_one_name_modified = coin_one_name.substr(0,1).toUpperCase() + coin_one_name.substr(1,coin_one_name.length);
+    coin_two_name_modified = coin_two_name.substr(0,1).toUpperCase() + coin_two_name.substr(1,coin_two_name.length);
+
+    coin_one_ticker_modified = coin_one_ticker.substr(0,1).toUpperCase() + coin_one_ticker.substr(1,coin_one_ticker.length);
+    coin_two_ticker_modified = coin_two_ticker.substr(0,1).toUpperCase() + coin_two_ticker.substr(1,coin_two_ticker.length);
+
+    last_price = last_price.toPrecision(9);
+    low_price = low_price.toPrecision(9);
+    high_price = high_price.toPrecision(9);
+    volume = volume.toPrecision(9);
+
+    coin_one_balance = coin_one_balance.toPrecision(9);
+    coin_two_balance = coin_two_balance.toPrecision(9);
+
+    if (kind = 'CALL'){
+      right = 'buy';
+      inverse_right = 'sell';
+    }
+    else{
+      right = 'sell';
+      inverse_right = 'buy';
+    }
+
+    min_order = 1;
+    order_fee = 0;
+
+
+
+    if ( pending_asks == null){
+      pending_asks = new Array();
+      obj = new Object();
+      obj.price = 0;
+      obj.quantity_left = 0;
+      pending_asks.push(obj);
+    }
+
+    if (pending_bids == null){
+      pending_bids = new Array();
+      obj = new Object();
+      obj.price = 0;
+      obj.quantity_left = 0;
+      pending_bids.push(obj);
+    }
+
+
+
+
+    string = '<div id="top_header">\
+    <div id="left_header">\
+    <div id="trade_pair_header">' 
+    + coin_one_ticker_upper + '/' + coin_two_ticker_upper + '/' + kind + '/' + strike + 
+    '</div>'
+    + coin_one_name_modified + '/' + coin_two_name_modified + ' ' + kind + ' option' + ' with strike price of ' + strike + '<br> and expiration on ' + format_time(expiration) + 
+    '</div>\
+    <div id="right_header">\
+    <div class="stat">\
+    <span class="title">LAST PRICE</span>\
+    <br>\
+    <strong>\
+    <span id="span_last_price" class="">' + last_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat">\
+    <span class="title">24 HR HIGH</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_high" class="">' + high_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat">\
+    <span class="title">24 HR LOW</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_low" class="">' + low_price + '</span>\
+    </strong>\
+    </div>\
+    <div class="stat unbordered">\
+    <span class="title">24 HR VOLUME</span>\
+    <br>\
+    <strong>\
+    <span id="span_24_low" class="">' + volume + ' ' + coin_two_ticker_upper + '</span>\
+    </strong>\
+    </div>\
+    </div>\
+    </div>\
+    <div style="clear:right;"></div>\
+    <div id="chartdiv" style="width:85%; height:600px; margin-top: 60px"></div>\
+    <div id="buy_sell">\
+    <div id="col1">\
+    <h3>Buy Option </h3>\
+    <div id="error_message"></div>\
+    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="box options">\
+                <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
+                <span class="label_style">Price Per option:</span> <input type="number" id="bid_price" name="price" value="' + pending_asks[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
+                <span class="label_style">Total:</span> <span class="total" id="buy_total">' + pending_asks[0].price.toPrecision(9) + '</span> <br>\
+                <span class="label_style">Margin Requirement:</span> <span class="margin" id="margin">0.00000000</span> <br>\
+                <span class="label_style">Trading Fee:</span> <span class="fee" id="buy_fee">0.00000000</span> BTC (' + (10 * order_fee).toPrecision(2) +  '%)<br>\
+                <span class="label_style">Net Total:</span> <span class="netTotalBuy" >' + pending_asks[0].price.toPrecision(9) + '</span> ' + coin_two_ticker_upper + 
+                '           <input type="hidden" name="buyNetTotal" id="buy_net_total" value="' + pending_asks[0].price.toPrecision(9) + '" class="required">\
+    </div>\
+     <div style="height: 50px"> *Right to ' + right + ' specified amount of ' +  coin_one_name_modified + 's for ' + strike + ' BTC each before expiration</div><button type="button" class="btn btn-primary" id="buy_order">Submit Buy Order</button>\
+    <h3>Sell Orders </h3>\
+    <div class="scroll_table">\
+    <table class="table" id="sell_table">\
+    <tbody>\
+    <tr>\
+                  <th>PRICE (' + coin_two_ticker_upper + ')</th>\
+                  <th>' + coin_one_ticker_upper + '</th>\
+                  <th>' + coin_two_ticker_upper + '</th>\
+                </tr>';
+
+
+    $.each(pending_asks, function(key,val){
+    substring = '<tr price="0.00000103">\
+    <td >' + val.price.toPrecision(9) + '</td>\
+    <td >' + val.quantity_left.toPrecision(9) + '</td>\
+    <td >' + (val.price * val.quantity_left).toPrecision(9) + '</td></tr>';
+    string += substring;
+    });
+
+
+//alert(string);
+
+
+    string += '</tbody>\
+    </table>\
+    </div>\
+    </div>\
+    <div id="col2">\
+    <h3>Sell Option</h3>\
+            <div id="error_message_sell"></div>\
+    <div class="fail box">Your ' + coin_two_ticker_upper +' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="box options">\
+                <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
+                <span class="label_style">Price Per option:</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
+                <span class="label_style">Total:</span> <span class="total" id="sell_total">' + pending_bids[0].price.toPrecision(9) + '</span> <br>\
+                <span class="label_style">Margin Requirement:</span> <span class="margin_requirement" id="margin_requirement">0.00000000</span> <br>\
+                <span class="label_style">Trading Fee:</span> <span class="fee" id="buy_fee">0.00000000</span> BTC (' + (10 * order_fee).toPrecision(2) +  '%)<br>\
+                <span class="label_style">Net Total:</span> <span class="netTotalSell" >' + pending_bids[0].price.toPrecision(9) + '</span> ' + coin_two_ticker_upper + 
+                '           <input type="hidden" name="buyNetTotal" id="buy_net_total" value="' + pending_bids[0].price.toPrecision(9) + '" class="required">\
+              </div>\
+    <div style="height: 50px"> *You may be forced to ' + inverse_right + ' specified amount of ' +  coin_one_name_modified + 's for ' + strike + ' BTC each before expiration</div>\
+    <button type="button" class="btn btn-primary" id="ask_submit">Submit Sell Order</button>\
+    <h3>Buy Orders </h3>\
+    <div class="scroll_table">\
+    <table class="table" id="sell_table">\
+    <tbody>\
+    <tr>\
+                  <th>PRICE (' + coin_two_ticker_upper + ')</th>\
+                  <th>' + coin_one_ticker_upper + '</th>\
+                  <th>' + coin_two_ticker_upper + '</th>\
+                </tr>';
+
+    $.each(pending_bids, function(key,val){
+    substring = '<tr price="0.00000103">\
+    <td >' + val.price.toPrecision(9) + '</td>\
+    <td >' + val.quantity_left.toPrecision(9) + '</td>\
+    <td >' + (val.price * val.quantity_left).toPrecision(9) + '</td></tr>';
+    string += substring;
+    });
+
+
+    string += '</tbody>\
+    </table>\
+    </div>\
+    </div>\
+    </div>';
+
+
+
+
+$('.inner_content').append(string);
+
+
+
+add_options_price_handlers();
+
+add_order_options_handlers();
+
+
+
+
+
+  }
+
+
+
+  if (document.URL.indexOf('market') != -1 && document.URL.indexOf('altmarket') == -1 && document.URL.indexOf('optmarket') == -1 ){
+
 
   $('#right_bar').empty();
 string = '<li class="dropdown">\

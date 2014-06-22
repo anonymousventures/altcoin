@@ -204,6 +204,33 @@ order_id = $(this).attr('order_id');
 
 
 
+function add_cancel_order_handler(){
+console.log('added');
+
+
+$('.cancel_alt_order').click(function(){
+console.log('fucking');
+order_id = $(this).attr('order_id');
+      $.ajax({
+        url: "/cancel_order",
+        type: "POST",
+        data: {order_id: order_id, _csrf: csrf},
+        dataType: "html"
+      }).done(function(data){
+
+        $('a[order_id=\'' + order_id + '\']').parent().parent().remove();
+
+
+      });
+
+    });
+
+
+}
+
+
+
+
 function generate_trading_table(){
 
 
@@ -262,6 +289,215 @@ string += '</tbody></table>';
 return string;
 
 
+
+}
+
+
+
+
+
+
+function add_options_price_handlers(){
+      console.log('here ' + coin_two_balance);
+   $('#bid_quantity').on('change', function () {
+      bid_quantity = $('#bid_quantity').val();
+      bid_price = $('#bid_price').val();
+
+
+      $('#buy_total').html( (bid_quantity * bid_price).toFixed(9) );
+      $('#buy_fee').html( (0).toFixed(9) );
+      $('.netTotalBuy').html( (bid_quantity * bid_price * 1).toFixed(9) );
+
+      total = bid_quantity * bid_price;
+
+      if (total > coin_two_balance){
+            console.log('inside here');
+      if ($('#error_message').html().length < 3)
+      $('#error_message').append('Net total must be less than or equal to your available balance.');
+      }
+      else{
+         if ($('#error_message').html().substr(0,3) == 'Net')
+            $('#error_message').empty();
+      }
+
+  }); 
+
+
+    $('#bid_price').on('change', function () {
+
+      bid_quantity = $('#bid_quantity').val();
+      bid_price = $('#bid_price').val();
+
+
+      $('#buy_total').html( (bid_quantity * bid_price).toFixed(9) );
+      $('#buy_fee').html( (0).toFixed(9) );
+      $('.netTotalBuy').html( (bid_quantity * bid_price * 1).toFixed(9) );
+
+      total = bid_quantity * bid_price;
+
+      if (total > coin_two_balance){
+            console.log('inside here');
+      if ($('#error_message').html().length < 3)
+      $('#error_message').append('Net total must be less than or equal to your available balance.');
+      }
+      else{
+         if ($('#error_message').html().substr(0,3) == 'Net')
+            $('#error_message').empty();
+      }
+
+
+  }); 
+
+
+
+
+
+
+
+    $('#ask_quantity').on('change', function () {
+
+      ask_quantity = parseFloat($('#ask_quantity').val());
+      ask_price =  parseFloat($('#ask_price').val());
+
+
+      $('#sell_total').html( (ask_quantity * ask_price).toFixed(9) );
+      $('#sell_fee').html( (0).toFixed(9) );
+      $('.netTotalSell').html( (ask_quantity * ask_price * 1).toFixed(9) );
+      $('#margin_requirement').html( (ask_quantity * 1).toFixed(9) );
+
+      margin = ask_quantity;
+
+      total =  margin;
+
+
+      if (total > coin_one_balance){
+            console.log('inside here');
+      if ($('#error_message_sell').html().length < 3)
+      $('#error_message_sell').append('Margin must be less than or equal to your available balance.');
+      }
+      else{
+         if ($('#error_message_sell').html().substr(0,3) == 'Mar')
+            $('#error_message_sell').empty();
+      }
+
+
+  }); 
+
+
+    $('#ask_price').on('change', function () {
+
+
+
+      ask_quantity =  parseFloat($('#ask_quantity').val());
+      ask_price =  parseFloat($('#ask_price').val());
+
+
+      $('#sell_total').html( (ask_quantity * ask_price).toFixed(9) );
+      $('#sell_fee').html( (0).toFixed(9) );
+      $('.netTotalSell').html( (ask_quantity * ask_price * 1).toFixed(9) );
+      $('#margin_requirement').html( (ask_quantity * 1).toFixed(9) );
+
+      margin = ask_quantity;
+
+      total = margin;
+
+      if (total > coin_one_balance){
+            console.log('inside here');
+      if ($('#error_message_sell').html().length < 3)
+      $('#error_message_sell').append('Margin must be less than or equal to your available balance.');
+      }
+      else{
+         if ($('#error_message_sell').html().substr(0,3) == 'Mar')
+            $('#error_message_sell').empty();
+      }
+
+  }); 
+
+}
+
+
+
+
+function add_order_options_handlers(){
+
+    $('#buy_order').click(function(){
+      bid_quantity = $('#bid_quantity').val();
+      bid_price = $('#bid_price').val();
+      coin_ticker_one = coin_one_ticker;
+      coin_ticker_two = coin_two_ticker;
+      coin_name_one = coin_one_name;
+      coin_name_two = coin_two_name;
+
+
+      //alert(buy_amount);
+
+      //alert(coin_ticker_one);
+
+      if (bid_quantity * bid_price <= 0)
+            alert('Total must be greater than 0!');
+      else
+      $.ajax({
+        url: "/buy_option",
+        type: "POST",
+        data: {expiration: expiration, strike: strike, call_put: kind,  bid_quantity: bid_quantity, bid_price: bid_price, coin_ticker_one: coin_ticker_one, coin_ticker_two: coin_ticker_two, coin_name_one: coin_name_one, coin_name_two: coin_name_two , _csrf: csrf },
+        dataType: "html"
+      }).done(function(data){
+
+        alert(data);
+
+      });
+
+    });
+
+
+
+
+    $('#ask_submit').click(function(){
+
+      //alert('yolo');
+      ask_quantity = $('#ask_quantity').val();
+      ask_price = $('#ask_price').val();
+      coin_ticker_one = coin_one_ticker;
+      coin_ticker_two = coin_two_ticker;
+      coin_name_one = coin_one_name;
+      coin_name_two = coin_two_name;
+      margin = ask_quantity;
+      //alert(buy_amount);
+
+
+      if (ask_quantity * ask_price <= 0)
+            alert('Total must be greater than or equal to zero!');
+      else
+      $.ajax({
+        url: "/sell_option",
+        type: "POST",
+        data: {expiration: expiration, strike: strike, call_put: kind, margin: margin, ask_quantity: ask_quantity, ask_price: ask_price, coin_ticker_one: coin_ticker_one, coin_ticker_two: coin_ticker_two, coin_name_one: coin_name_one, coin_name_two: coin_name_two , _csrf: csrf },
+        dataType: "html"
+      }).done(function(data){
+
+        alert(data);
+
+      });
+
+    });
+
+
+}
+
+
+
+
+function format_time(time){
+
+      expiration_time = parseInt(time.toString().substring(0, time.toString().length - 3));
+    
+    expiration_time = moment.unix(expiration_time).toArray();
+    expiration_time = moment.utc(expiration_time);
+    expiration_time = expiration_time.toString();
+    index = expiration_time.indexOf('+');
+    expiration_time = expiration_time.substr(0, index);
+
+    return expiration_time;
 
 }
 
