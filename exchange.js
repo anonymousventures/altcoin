@@ -309,6 +309,7 @@ var Order = new mongoose.Schema({
     seller_quantities: [Number],
     opposing_users: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
     opposing_quantities: [Number],
+    exercised_quantity: Number,
     opposing_orders: [{ type: mongoose.Schema.ObjectId, ref: 'Order' }]
 });
 
@@ -5963,7 +5964,72 @@ res.end("done");
 app.post('/exercise_option', function(req,res){
 
 //console.log(req.body.order_id);
-Order.findByIdAndUpdate(req.body.order_id, { $set: {pending: 'exercised'}}).populate('opposing_orders').exec( function(err, order){
+// $set: {pending: 'exercised'}
+
+
+
+console.log('here');
+Order.findByIdAndUpdate(req.body.order_id, { $set: {pending: 'exercised'}}).populate('opposing_orders user opposing_users').exec( function(err, order){
+
+
+//see if user has enough money
+
+
+
+//update buyers money
+console.log('ugh');
+total = order.quantity - order.quantity_left;
+total_cost = total * order.price;
+
+Coin.findOne(order.user['bitcoin']).exec(function(err, coin){
+
+available_balance = coin.available_balance;
+
+if (total_cost <= available_balance){
+
+User.findOne({email: req.session.user.email}).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
+
+user[order.coin_two_name].update({$inc: {balance: -1 * total * order.price, available_balance: -1 * total * order.price}}).exec();
+user[order.coin_one_name].update({$inc: {balance: total, available_balance: total}}).exec();
+
+
+});
+
+$.each(order.opposing_users, function(key, val){
+
+opposing_quantity = order.opposing_quantities[key];
+opposing_gain = opposing_quantity * order.price;
+
+User.findById(val).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
+
+user[order.coin_one_name].update({$inc: {in_positions: -1 * opposing_quantity }}).exec();
+user[order.coin_two_name].update({$inc: {balance: opposing_gain, available_balance: opposing_gain}}).exec();
+
+res.end('done');
+
+
+});
+
+
+
+
+});
+
+
+
+
+}
+
+});
+
+
+// Coin.findByIdAndUpdate({coin_name: order.coin_one_name}, {$inc: {balance: total, available_balance: total}}, function(err, coin){
+
+// console.log(coin);
+
+// });
+// console.log('ugh');
+
 // console.log(order._id);
 // bid_total_quantity = order.quantity;
 
