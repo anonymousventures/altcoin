@@ -394,10 +394,10 @@ all_clients.push(litecoin_client);
 var ip = require("ip");
 console.dir ( ip.address() );
 
-if ( ip.address() == '172.31.2.194')
-    prefix = 'http://genesisblock.io/'
-else
+if ( ip.address() == '192.168.1.56')
     prefix = 'http://localhost:8080/';
+else
+    prefix = 'http://genesisblock.io/'
 //prefix = 'http://ec2-54-186-16-187.us-west-2.compute.amazonaws.com/';
 
 var io = require('socket.io').listen(server);
