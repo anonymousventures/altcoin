@@ -841,6 +841,7 @@ res.render('trade_coins.html', {activated: req.session.activated, user: JSON.str
 });
 
 }
+else res.redirect('/');
 
 });
 
@@ -1021,6 +1022,8 @@ if (high_price == null)
 
 
 
+
+
 res.render('trade_options.html', {activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
 
 });
@@ -1039,6 +1042,7 @@ res.render('trade_options.html', {activated: req.session.activated, user: JSON.s
 });
 
 }
+else res.redirect('/');
 
 });
 
@@ -5451,8 +5455,8 @@ console.log(activated);
 console.log(user);
 
 OrderData.find({}).sort('-time').limit(5).exec(function(err, orderdata){
-Order.find({$and: [{pending: 'pending'}, {side: 'bid'}]}).sort('-time').limit(5).exec(function(err, bids){
-Order.find({$and: [{pending: 'pending'}, {side: 'ask'}]}).sort('-time').limit(5).exec(function(err, asks){
+Order.find({$and: [{pending: 'pending'}, {side: 'bid'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, bids){
+Order.find({$and: [{pending: 'pending'}, {side: 'ask'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, asks){
 
 res.render('index_exchange.html', {activated: JSON.stringify(activated), user: JSON.stringify(user),asks: JSON.stringify(asks),bids: JSON.stringify(bids), orderdata: JSON.stringify(orderdata)});
 
@@ -5652,7 +5656,19 @@ array.push(obj);
 if (array.length == coins.length){
 
 console.log('this array ' + JSON.stringify(array));
-res.render('coin_trading.html', {coin_data: JSON.stringify(array), user: JSON.stringify(req.session.user), activated: req.session.activated});
+
+
+activated = req.session.activated;
+user = req.session.user;
+
+console.log('status ' + activated);
+
+if (activated != true)
+    activated = false;
+if (user == undefined)
+    user = null;
+
+res.render('coin_trading.html', {coin_data: JSON.stringify(array), user: JSON.stringify(user), activated: JSON.stringify(activated)});
 
 }
 
@@ -5865,10 +5881,20 @@ console.log(array);
 
 // });
 
+activated = req.session.activated;
+user = req.session.user;
 
+console.log('status ' + activated);
+
+if (activated != true)
+    activated = false;
+if (user == undefined)
+    user = null;
+
+console.log('later status ' + activated);
 
 console.log('this array ' + JSON.stringify(array));
-res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(req.session.user), activated: req.session.activated});
+res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(user), activated: JSON.stringify(activated)});
 
 }
 

@@ -6,7 +6,7 @@ else
   prefix = 'http://genesisblock.io/';
 
 
-if ( document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
+if ( document.URL.indexOf('altmarket') != -1 ||document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
 
 
 if (activated){
@@ -40,7 +40,7 @@ string = '<div class="index_col col-md-6 col-lg-6 col-sm-6 col-xs-6">\
         <thead>\
           <tr>\
             <th>Time </th>\
-            <th>Option Symbol</th>\
+            <th>Trade Pair</th>\
             <th>Amount</th>\
             <th>Price</th>\
           </tr>\
@@ -52,7 +52,7 @@ time = format_time(val.time);
 
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
         <td class="index_td">' + time + '</td>\
-        <td class="index_td">' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="index_td">' + val.coin_ticker_one.toUpperCase() + '/BTC</td>\
         <td class="index_td">' + val.quantity.toPrecision(5) + '</td>\
         <td class="index_td">' + val.price.toPrecision(5) + '</td>\
 </tr>';
@@ -82,7 +82,7 @@ string += '</tbody></table>\
 $.each(bids, function(key,val){
 
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="index_td" >' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="index_td" >' + val.coin_one_ticker.toUpperCase() + '/BTC</td>\
         <td class="index_td" >' + val.quantity.toPrecision(5) + '</td>\
         <td class="index_td">' + val.price.toPrecision(5) + '</td>\
 </tr>';
@@ -108,7 +108,7 @@ string += '</tbody></table></div>\
 $.each(asks, function(key,val){
 
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="index_td" >' + val.short_symbol.toUpperCase() + '</td>\
+        <td class="index_td" >' + val.coin_one_ticker.toUpperCase() + '/BTC</td>\
         <td class="index_td" >' + val.quantity.toPrecision(5) + '</td>\
         <td class="index_td">' + val.price.toPrecision(5) + '</td>\
 </tr>';
