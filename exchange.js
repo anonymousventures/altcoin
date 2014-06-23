@@ -4787,6 +4787,7 @@ password = req.body.password;
 
 User.findOne({email: email}, function(err, user){
 
+if (user != undefined){
 if (user.activated == false){
 
     res.end('Not activated yet. Please search both inbox and spam for activation email');
@@ -4850,6 +4851,7 @@ res.end('You tried to login more than 5 times in the past 2 minutes. Please wait
 
 
 }
+}else res.end('Account not found');
 
 
 
