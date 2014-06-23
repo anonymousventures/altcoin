@@ -841,7 +841,7 @@ res.render('trade_coins.html', {activated: req.session.activated, user: JSON.str
 });
 
 }
-else res.redirect('/');
+else res.redirect('/login');
 
 });
 
@@ -1042,7 +1042,7 @@ res.render('trade_options.html', {activated: req.session.activated, user: JSON.s
 });
 
 }
-else res.redirect('/');
+else res.redirect('/login');
 
 });
 
