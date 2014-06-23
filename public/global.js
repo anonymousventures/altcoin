@@ -130,6 +130,51 @@ $('#bottom_area').append(string);
 }
 
 
+if (document.URL.indexOf('options') != -1){
+
+string = generate_options_table();
+$('#trading_table').append(string);
+
+
+     $("a.options_page_href").on("click",function(){
+         ticker = $(this).attr("ticker");
+         window.open(prefix + 'optmarket/' + ticker ,'_blank');
+     });
+
+
+    $('.select_coin').change(function() {
+        coin_name = $(this).val();
+        $('.select_coin').val(coin_name);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+        expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+    $('html, body').animate({
+        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+    }, 1000);
+
+
+    });
+
+        $('.select_expiration').change(function() {
+        coin_name = $('.select_coin').val();
+        $('.select_coin').val(coin_name);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+        expiration_time = $('option:selected', $(this)).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+    $('html, body').animate({
+        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+    }, 1000);
+
+
+    });
+
+
+
+}
+
+
 if (document.URL.indexOf('coin_trading') != -1){
 
 string = generate_trading_table();
@@ -1011,150 +1056,150 @@ $(this).parent().next().remove();
 
 
 
-function generate_options_table(){
+// function generate_options_table(){
 
 
 
-selection = '';
+// selection = '';
 
-expiration_array = new Array(1404259200000, 1404950400000, 1407628800000, 1410307200000, 1412899200000, 1418169600000, 1425945600000, 1436486400000);
-
-
-
-$.each(expiration_array, function(key,val){
-expiration_group = key + 1;
-expiration_time = format_time(val);
-    sub = '<option value="'+ expiration_group + '">' + expiration_time +'</option>';
-    selection += sub;
-});
-
-//$('.select_expiration').html(selection);
-
-//alert(deposits);
-string ='';
-//<select class="form-control select_expiration" style="width:300px" >' + selection + '</select>
-    table_top = '<table class="table table-bordered"  style="margin-bottom:50px">\
-        <thead>\
-          <tr>\
-            <th>Option Name</th>\
-            <th>Type</th>\
-            <th>Bid</th>\
-            <th>Ask</th>\
-            <th>Extrinsic <br> Bid / Ask</th>\
-            <th>IV <br> Bid / Ask</th>\
-            <th>Volume</th>\
-            <th>Open Interest</th>\
-            <th>Strike</th>\
-            <th>Expiration</th>\
-          </tr>\
-        </thead><tbody>';
-
-//string += table_top;
-
-//alert(string);
-//alert(JSON.stringify(contracts));
-
-$.each(contracts, function(key,val){
-
-
-if (val.bid == null){
-bid = 'n/a';
-intrinsic_bid = 'n/a'
-extrinsic_bid = 'n/a';
-
-}
-else{
-bid = val.bid;
-intrinsic_bid = val.intrinsic_bid;
-extrinsic_bid = val.extrinsic_bid;
+// expiration_array = new Array(1404259200000, 1404950400000, 1407628800000, 1410307200000, 1412899200000, 1418169600000, 1425945600000, 1436486400000);
 
 
 
-}
+// $.each(expiration_array, function(key,val){
+// expiration_group = key + 1;
+// expiration_time = format_time(val);
+//     sub = '<option value="'+ expiration_group + '">' + expiration_time +'</option>';
+//     selection += sub;
+// });
+
+// //$('.select_expiration').html(selection);
+
+// //alert(deposits);
+// string ='';
+// //<select class="form-control select_expiration" style="width:300px" >' + selection + '</select>
+//     table_top = '<table class="table table-bordered"  style="margin-bottom:50px">\
+//         <thead>\
+//           <tr>\
+//             <th>Option Name</th>\
+//             <th>Type</th>\
+//             <th>Bid</th>\
+//             <th>Ask</th>\
+//             <th>Extrinsic <br> Bid / Ask</th>\
+//             <th>IV <br> Bid / Ask</th>\
+//             <th>Volume</th>\
+//             <th>Open Interest</th>\
+//             <th>Strike</th>\
+//             <th>Expiration</th>\
+//           </tr>\
+//         </thead><tbody>';
+
+// //string += table_top;
+
+// //alert(string);
+// //alert(JSON.stringify(contracts));
+
+// $.each(contracts, function(key,val){
 
 
-if (val.ask == null){
-ask = 'n/a';
-intrinsic_ask = 'n/a';
-extrinsic_ask = 'n/a';
-}
-else{
-ask = val.ask;
-intrinsic_ask  = val.intrinsic_ask;
-extrinsic_ask = val.extrinsic_ask;
-}
+// if (val.bid == null){
+// bid = 'n/a';
+// intrinsic_bid = 'n/a'
+// extrinsic_bid = 'n/a';
 
-volume = 0;
-open_interest = 0;
-strike_price = val.strike_price;
+// }
+// else{
+// bid = val.bid;
+// intrinsic_bid = val.intrinsic_bid;
+// extrinsic_bid = val.extrinsic_bid;
 
 
 
-
-expiration_time = format_time(val.expiration_time);
-
-substring = '';
+// }
 
 
-if (key%10 == 0){
-group = (key/10) + 1;
-console.log(key);
-console.log(selection);
-substring = '';
+// if (val.ask == null){
+// ask = 'n/a';
+// intrinsic_ask = 'n/a';
+// extrinsic_ask = 'n/a';
+// }
+// else{
+// ask = val.ask;
+// intrinsic_ask  = val.intrinsic_ask;
+// extrinsic_ask = val.extrinsic_ask;
+// }
 
-if (key!=0)
-substring += '<span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span> <br> <select class="form-control select_expiration" style="width:300px" >' + selection + '</select>';
-
-substring += table_top + '<tr id="tab_row" style="margin-bottom: 30px" group="' + group + '">\
-        <td class="tab_td_order"><a class="contract_page_href" short_symbol="' + val.short_symbol + '">' + val.short_symbol + '</td>\
-        <td class="tab_td_order">' + val.option_type.toUpperCase() + '</td>\
-        <td class="tab_td_order">' + bid + '</td>\
-        <td class="tab_td_order">' + ask + '</td>\
-        <td class="tab_td_order">' + extrinsic_bid + '<br>' + extrinsic_ask + '</td>\
-        <td class="tab_td_order">' + intrinsic_bid + '<br>' + intrinsic_ask + '</td>\
-        <td class="tab_td_order">' + volume + '</td>\
-        <td class="tab_td_order">' + open_interest  + '</td>\
-        <td class="tab_td_order">' + strike_price + '</td>\
-        <td class="tab_td_order">' + expiration_time + '</td>\
-</tr>';
-//alert(substring);
-}
-else{
-substring = '<tr id="tab_row">\
-        <td class="tab_td_order"><a class="contract_page_href" short_symbol="' + val.short_symbol + '">' + val.short_symbol + '</td>\
-        <td class="tab_td_order">' + val.option_type.toUpperCase() + '</td>\
-        <td class="tab_td_order">' + bid + '</td>\
-        <td class="tab_td_order">' + ask + '</td>\
-        <td class="tab_td_order">' + extrinsic_bid + '<br>' + extrinsic_ask + '</td>\
-        <td class="tab_td_order">' + intrinsic_bid + '<br>' + intrinsic_ask + '</td>\
-        <td class="tab_td_order">' + volume + '</td>\
-        <td class="tab_td_order">' + open_interest  + '</td>\
-        <td class="tab_td_order">' + strike_price + '</td>\
-        <td class="tab_td_order">' + expiration_time + '</td>\
-</tr>';  
-
-}
-string += substring; 
+// volume = 0;
+// open_interest = 0;
+// strike_price = val.strike_price;
 
 
 
 
+// expiration_time = format_time(val.expiration_time);
+
+// substring = '';
+
+
+// if (key%10 == 0){
+// group = (key/10) + 1;
+// console.log(key);
+// console.log(selection);
+// substring = '';
+
+// if (key!=0)
+// substring += '<span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span> <br> <select class="form-control select_expiration" style="width:300px" >' + selection + '</select>';
+
+// substring += table_top + '<tr id="tab_row" style="margin-bottom: 30px" group="' + group + '">\
+//         <td class="tab_td_order"><a class="contract_page_href" short_symbol="' + val.short_symbol + '">' + val.short_symbol + '</td>\
+//         <td class="tab_td_order">' + val.option_type.toUpperCase() + '</td>\
+//         <td class="tab_td_order">' + bid + '</td>\
+//         <td class="tab_td_order">' + ask + '</td>\
+//         <td class="tab_td_order">' + extrinsic_bid + '<br>' + extrinsic_ask + '</td>\
+//         <td class="tab_td_order">' + intrinsic_bid + '<br>' + intrinsic_ask + '</td>\
+//         <td class="tab_td_order">' + volume + '</td>\
+//         <td class="tab_td_order">' + open_interest  + '</td>\
+//         <td class="tab_td_order">' + strike_price + '</td>\
+//         <td class="tab_td_order">' + expiration_time + '</td>\
+// </tr>';
+// //alert(substring);
+// }
+// else{
+// substring = '<tr id="tab_row">\
+//         <td class="tab_td_order"><a class="contract_page_href" short_symbol="' + val.short_symbol + '">' + val.short_symbol + '</td>\
+//         <td class="tab_td_order">' + val.option_type.toUpperCase() + '</td>\
+//         <td class="tab_td_order">' + bid + '</td>\
+//         <td class="tab_td_order">' + ask + '</td>\
+//         <td class="tab_td_order">' + extrinsic_bid + '<br>' + extrinsic_ask + '</td>\
+//         <td class="tab_td_order">' + intrinsic_bid + '<br>' + intrinsic_ask + '</td>\
+//         <td class="tab_td_order">' + volume + '</td>\
+//         <td class="tab_td_order">' + open_interest  + '</td>\
+//         <td class="tab_td_order">' + strike_price + '</td>\
+//         <td class="tab_td_order">' + expiration_time + '</td>\
+// </tr>';  
+
+// }
+// string += substring; 
 
 
 
-//}
-
-});
-
-string += '</tbody></table>'; 
 
 
 
-return string;
+
+// //}
+
+// });
+
+// string += '</tbody></table>'; 
 
 
 
-}
+// return string;
+
+
+
+// }
 
 
 
@@ -1890,6 +1935,26 @@ add_cancel_order_handler();
 
 
 
+  if (document.URL.indexOf('options') != -1){
+
+
+    $.each(expiration_array, function(key,val){
+    expiration_group = key + 1;
+    expiration_time = format_time(val);
+    sub = '<option value="'+ expiration_group + '">' + expiration_time +'</option>';
+    selection += sub;
+    });
+
+
+
+
+
+
+  }
+
+
+
+
 
   if (document.URL.indexOf('altmarket') != -1){
 
@@ -2088,6 +2153,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     low_price = low_price.toPrecision(9);
     high_price = high_price.toPrecision(9);
     volume = volume.toPrecision(9);
+    strike = strike.toFixed(9);
 
     coin_one_balance = coin_one_balance.toPrecision(9);
     coin_two_balance = coin_two_balance.toPrecision(9);

@@ -297,6 +297,191 @@ return string;
 
 
 
+function generate_options_table(){
+
+
+console.log(coin_data);
+
+//$('.select_expiration').html(selection);
+
+//alert(deposits);
+table_header = '<table class="table table-bordered"  style="margin-bottom:50px">\
+        <thead>\
+          <tr>\
+            <th>Market</th>\
+            <th>Last Trading<br> Price</th>\
+            <th>Bid</th>\
+            <th>Ask</th>\
+            <th>Volume</th>\
+            <th>24 hour low</th>\
+            <th>24 hour high</th>\
+            <th>Strike Price</th>\
+            <th>Expiration</th>\
+          </tr>\
+        </thead><tbody>';
+
+
+
+
+string = '<table class="table table-bordered"  style="margin-bottom:50px">\
+        <thead>\
+          <tr>\
+            <th>Market</th>\
+            <th>Last Trading<br> Price</th>\
+            <th>Bid</th>\
+            <th>Ask</th>\
+            <th>Volume</th>\
+            <th>24 hour low</th>\
+            <th>24 hour high</th>\
+            <th>Strike Price</th>\
+            <th>Expiration</th>\
+          </tr>\
+        </thead><tbody>';
+
+
+expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+
+
+coin_selection = '';
+
+$.each(coins, function(key,val){
+
+    sub = '<option coin_name="'+ val + '">' + val +'</option>';
+    coin_selection += sub;
+
+});
+
+
+expiration_selection = '';
+
+
+$.each(expiration_times, function(key,val){
+expiration_time = format_time(val);
+    sub = '<option expiration_time="'+ val + '">' + expiration_time +'</option>';
+    expiration_selection += sub;
+});
+
+
+selection_string = '<span style="text-align: left; margin-left: 0px !important">Select coin:</span>\
+ <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+ <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
+ <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
+
+
+string = '';
+
+// string += '<span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
+//  <br> <select class="form-control select_expiration" style="width:300px" >' + selection + '</select>';
+
+
+//string += table_top;
+
+//alert(string);
+//alert(JSON.stringify(contracts));
+
+$.each(coin_data, function(key,val){
+
+
+href_ticker = val.coin_one_ticker + '/btc/' + val.call_put + '/' + val.strike.toFixed(9) + '/' + val.expiration;
+href_title = val.coin_one_ticker.toUpperCase() + '/BTC/' + val.call_put + '/<br>' + val.strike.toFixed(9) + '/<br>' + val.expiration;
+
+if (key%6 == 0){
+
+console.log('in here' + key);
+
+
+table_header = '<table class="table table-bordered"  style="margin-bottom:50px">\
+        <thead key="' + key + '" coin_name_anchor="' + val.coin_one_name  +'" expiration_time_anchor="' + val.expiration +'">\
+          <tr>\
+            <th>Market</th>\
+            <th>Last Trading<br> Price</th>\
+            <th>Bid</th>\
+            <th>Ask</th>\
+            <th>Volume</th>\
+            <th>24 hour low</th>\
+            <th>24 hour high</th>\
+            <th>Strike Price</th>\
+            <th>Expiration</th>\
+          </tr>\
+        </thead><tbody>';
+
+selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
+ <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+ <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
+ <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
+
+substring = selection_string;
+substring += table_header;
+
+substring +='<tr id="tab_row" style="margin-bottom: 30px">\
+        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order">' + val.last + '</td>\
+        <td class="tab_td_order">' + val.bid + '</td>\
+        <td class="tab_td_order">' + val.ask + '</td>\
+        <td class="tab_td_order">' + val.volume + '</td>\
+        <td class="tab_td_order">' + val.low + '</td>\
+        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
+        <td class="tab_td_order">' + format_time(val.expiration)  + '</td>\
+</tr>';
+
+console.log(substring);
+
+
+}
+
+else if (key%6 == 5)
+substring = '<tr id="tab_row" style="margin-bottom: 30px">\
+        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order">' + val.last + '</td>\
+        <td class="tab_td_order">' + val.bid + '</td>\
+        <td class="tab_td_order">' + val.ask + '</td>\
+        <td class="tab_td_order">' + val.volume + '</td>\
+        <td class="tab_td_order">' + val.low + '</td>\
+        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
+        <td class="tab_td_order">' + format_time(val.expiration)  + '</td>\
+</tr></tbody></table>';
+
+else  
+substring = '<tr id="tab_row" style="margin-bottom: 30px">\
+        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order">' + val.last + '</td>\
+        <td class="tab_td_order">' + val.bid + '</td>\
+        <td class="tab_td_order">' + val.ask + '</td>\
+        <td class="tab_td_order">' + val.volume + '</td>\
+        <td class="tab_td_order">' + val.low + '</td>\
+        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
+        <td class="tab_td_order">' + format_time(val.expiration) + '</td>\
+</tr>';
+//alert(substring);
+
+
+string += substring; 
+
+
+});
+
+
+
+
+//}
+
+
+//string += '</tbody></table>'; 
+
+
+
+return string;
+
+
+
+}
+
+
+
+
 function add_options_price_handlers(){
       console.log('here ' + coin_two_balance);
    $('#bid_quantity').on('change', function () {

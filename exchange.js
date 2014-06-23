@@ -319,6 +319,9 @@ var OrderData = new mongoose.Schema({
     short_symbol: String,
     coin_ticker_one: String,
     coin_ticker_two: String,
+    put_call: String,
+    strike: Number,
+    expiration: Number,
     price: Number,
     quantity: Number
     });
@@ -866,16 +869,18 @@ current_time = Math.floor(new Date().getTime()/1000);
 one_day_ago = current_time - (60 * 60 * 24);
 
 
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+
+
+Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
 //find all orders within past day
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 //find last order
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 
 Coin.findOne({code: coin1}, function(err, coin_one){
 Coin.findOne({code: coin2}, function(err, coin_two){
@@ -2099,8 +2104,11 @@ coin_two_name = req.body.coin_name_two;
 coin_one_ticker = req.body.coin_ticker_one
 coin_two_ticker = req.body.coin_ticker_two;
 expiration = req.body.expiration;
-strike = req.body.strike;
+strike = parseFloat(req.body.strike).toFixed(9);
 call_put = req.body.call_put;
+
+
+console.log('dastrike ' + strike);
 
 //console.log('coinone' + coin_one_name);
 
@@ -2312,6 +2320,8 @@ if (!complete ){
                             time: time,
                             coin_ticker_one: coin_one_ticker,
                             coin_ticker_two: coin_two_ticker,
+                            strike: strike,
+                            expiration: expiration,
                             price: ask_price,
                             quantity: bid_quantity
         });
@@ -2411,7 +2421,9 @@ if (!complete ){
                             coin_ticker_one: coin_one_ticker,
                             coin_ticker_two: coin_two_ticker,
                             price: ask_price,
-                            quantity: ask_quantity_left
+                            quantity: ask_quantity_left,
+                            strike: strike,
+                            expiration: expiration,
         });
 
         order_data.save(function(err){
@@ -2784,13 +2796,13 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
 
 
         //add opposing orders and users to newly created order 
-        $.each(ask, function(keyb, valb){
+        $.each(bid, function(keyb, valb){
         if (keyb <= key){
         order.opposing_orders.push(valb);
         order.opposing_users.push(valb.user);
         
         if (keyb == key)
-            order.opposing_quantities.push(bid_quantity_left);
+            order.opposing_quantities.push(ask_quantity_left);
         else
             order.opposing_quantities.push(valb.quantity_left);
 
@@ -2798,13 +2810,13 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         });
 
         //add opposing orders to opposing orders
-        $.each(ask, function(keyb, valb){
+        $.each(bid, function(keyb, valb){
 
             valb.opposing_orders.push(order);
             valb.opposing_users.push(user);
 
             if (keyb == key)
-                valb.opposing_quantities.push(bid_quantity_left);
+                valb.opposing_quantities.push(ask_quantity_left);
             else
                 valb.opposing_quantities.push(valb.quantity_left);
 
@@ -2817,7 +2829,9 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             coin_ticker_one: coin_one_ticker,
                             coin_ticker_two: coin_two_ticker,
                             price: bid_price,
-                            quantity: ask_quantity
+                            quantity: ask_quantity,
+                            strike: strike,
+                            expiration: expiration
         });
 
         order_data.save(function(err){
@@ -2917,7 +2931,9 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             coin_ticker_one: coin_one_ticker,
                             coin_ticker_two: coin_two_ticker,
                             price: bid_price,
-                            quantity: bid_quantity_left
+                            quantity: bid_quantity_left,
+                            strike: strike,
+                            expiration: expiration,
         });
 
         order_data.save(function(err){
@@ -2955,7 +2971,7 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                     call_put: call_put
             });
 
-                $.each(ask, function(keyb, valb){
+                $.each(bid, function(keyb, valb){
                 if (keyb <= key){
                 order.opposing_orders.push(valb);
                 order.opposing_users.push(valb.user);
@@ -2965,7 +2981,7 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                 });
 
                 //add opposing orders to opposing orders
-                $.each(ask, function(keyb, valb){
+                $.each(bid, function(keyb, valb){
 
                     valb.opposing_orders.push(order);
                     valb.opposing_users.push(user);
@@ -5580,6 +5596,7 @@ Coin.aggregate(
 $.each(result, function(key,val){
 
 
+(function(key,val){
 Order.findOne({$and: [{coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
 Order.findOne({$and: [{coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
 OrderData.findOne({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
@@ -5632,7 +5649,7 @@ obj.volume = volume;
 
 array.push(obj);
 
-if (key == result.length -1){
+if (array.length == coins.length){
 
 console.log('this array ' + JSON.stringify(array));
 res.render('coin_trading.html', {coin_data: JSON.stringify(array), user: JSON.stringify(req.session.user), activated: req.session.activated});
@@ -5650,7 +5667,227 @@ res.render('coin_trading.html', {coin_data: JSON.stringify(array), user: JSON.st
 
 
 
+})(key,val);
+});
 
+
+
+
+  });
+
+
+
+
+
+});
+
+
+});
+
+
+
+
+app.get('/options', function(req,res){
+
+
+expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+
+// current_prices = new Object();
+// current_prices.ltc = .016;
+// current_prices.doge = 0.0000005;
+
+
+
+
+ // db.images.aggregate( 
+ //       {$match   : {hashtag: {$in:["tag1","tag2"]}}}, 
+ //       {$group   : {_id:"$hashtag", name: {$first:"$name"}}},
+ //       {$project : {hashtag:"$_id", name: "$name", _id:0}}
+ //  )
+
+current_time = new Date().getTime()/1000;
+one_day_ago = current_time - (60 * 60 * 24 * 1000);
+
+array = new Array();
+Coin.find().distinct('coin_name', function(err, coins) {
+
+coins.splice( $.inArray('bitcoin', coins), 1 );
+console.log(coins);
+
+Coin.aggregate( 
+       {$match   : {coin_name: {$in: coins }}}, 
+       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+  ).exec(function(err, result){
+
+
+    // ids is an array of all ObjectIds
+
+
+
+$.each(result, function(key,val){
+
+$.each(expiration_times, function(keyb,valb){
+
+
+(function(key,val,keyb, valb){
+
+if (val.code == 'ltc')
+current_price = .016;
+if (val.code == 'doge')
+current_price = 0.0000005;
+
+price_deviation = current_price/10;
+starting = current_price - 3 * price_deviation;
+
+prices = new Array();
+
+for (var i=0; i < 6; i++){
+    
+    price = starting + i * price_deviation;
+    prices.push(price);
+
+}
+
+
+
+$.each(prices, function(keyc, valc){
+
+console.log('fucking price ' + valc);
+
+(function(keyc,valc){    
+Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+
+var bid_price;
+var ask_price;
+
+console.log('stupid' + val.coin_name + ' ' + valb + ' ' + orders_within_day)
+
+if (bid == null)
+bid_price = 'n/a';
+else
+bid_price = bid.price;
+
+
+if (ask == null)
+ask_price = 'n/a';
+else
+ask_price = ask.price;
+
+console.log('da bid ' + bid_price);
+
+volume = 0;
+$.each(orders_within_day, function(key,val){
+
+volume += (val.quantity - val.quantity_left);
+
+});
+
+volume = volume/2;
+
+console.log('im confused ' + valc);
+
+obj = new Object();
+obj.coin_one_name = val.coin_name;
+obj.coin_two_name = 'bitcoin';
+obj.coin_one_ticker = val.code;
+obj.coin_two_ticker = 'btc';
+obj.bid = bid_price;
+obj.ask = ask_price;
+
+if (lowest_order == null){
+obj.low = 0;
+obj.high = 0;
+obj.last = 0;
+}
+else{
+obj.low = lowest_order.price;
+obj.high = highest_order.price;
+obj.last = last_order.price;
+}
+
+obj.volume = volume;
+obj.expiration = valb;
+obj.strike = valc;
+obj.call_put = 'CALL';
+
+console.log(valb);
+
+array.push(obj);
+
+if (array.length == coins.length * 4 * 6){
+
+
+//sorting functions
+function dynamicSort(property) { 
+    return function (obj1,obj2) {
+        return obj1[property] > obj2[property] ? 1
+            : obj1[property] < obj2[property] ? -1 : 0;
+    }
+}
+
+function dynamicSortMultiple() {
+    /*
+     * save the arguments object as it will be overwritten
+     * note that arguments object is an array-like object
+     * consisting of the names of the properties to sort by
+     */
+    var props = arguments;
+    return function (obj1, obj2) {
+        var i = 0, result = 0, numberOfProperties = props.length;
+        /* try getting a different result from 0 (equal)
+         * as long as we have extra properties to compare
+         */
+        while(result === 0 && i < numberOfProperties) {
+            result = dynamicSort(props[i])(obj1, obj2);
+            i++;
+        }
+        return result;
+    }
+}
+
+array.sort(dynamicSortMultiple("coin_one_name","expiration", "strike"));
+
+console.log(array);
+
+// modified_array = new Array();
+// $.each(array, function(key,val){
+
+
+
+
+// });
+
+
+
+console.log('this array ' + JSON.stringify(array));
+res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(req.session.user), activated: req.session.activated});
+
+}
+
+
+});
+});
+});
+});
+});
+});
+})(keyc, valc);
+});
+
+
+
+
+})(key,val, keyb, valb);
+
+});
 });
 
 
@@ -5746,6 +5983,10 @@ sub.intrinsic_bid = 0;
 
 
 
+
+//require(functions.js);
+
+
 if (ask != null){
 sub.ask = ask.price;
 extrinsic_ask = (10/(current_price * (current_price - val.strike_price)));
@@ -5824,6 +6065,10 @@ res.render('trading.html', {activated: JSON.stringify(activated), user: JSON.str
 
 
 });
+
+
+
+
 
 app.get('/tester', function(req,res){
 
