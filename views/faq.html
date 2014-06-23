@@ -120,13 +120,16 @@ user = {{{user}}};
 <div id="voting_header"> FAQ </div>
 
 <div id="about_explanation">
-<h2> How are maintenance margins enforced on the opposing side of the trade? </h2>
 
-If the user on the opposing side of the trade fails to maintain the required margin of 75% of the initial margin, he is subject to a margin call at anytime. However, the trader on the opposing side has a disincentive to be margin called. Still, in the case that the opposing trader fails to maintain the position's margin, and if the variation margin at expiration or exercise time is greater than the opposing trader's maintenance margin - then the position is automatically closed and your maximum profit is capped at the opposing trader's maintenance margin. In most positions, this would still allow you to profit completely on your position up to a 30% change in Bitcoin price. So, for someone looking to sell a call margin with a strike price of $1,000 when the current price is $500, our system would require the seller to put up an initial margin that would account for the amount the option is in the money plus an additional 30% change in price.
 
 <h2> Why use GenesisBlock.io instead of a regular exchange when speculating on bitcoin? </h2>
 
-GenesisBlock.io allows you to effectively trade with 3:1 leverage on Bitcoin. So, if you maintain your minimum maintenance margin, you can make 3 times as much profit on an equal rise or drop in the price of bitcoin. At the same time, this of course makes it more risky.
+GenesisBlock.io allows you to effectively trade alternative cryptocurrencies with leverage on Bitcoin. So, for example, if you are confident that an altcoin will appreciate in value in the near future, while traders that underwrite call options are more bearish, you can make more profit if you are correct about your position.
+
+
+<h2> How are maintenance margins enforced on the opposing side of the trade? </h2>
+
+When someone underwrites a call option, the corresponding altcoin is stored on their account in our database until exercise or expiration. When someone underwrites a put option, bitcoin is stored on their account in our database.
 
 
 
