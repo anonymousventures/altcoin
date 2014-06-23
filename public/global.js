@@ -6,7 +6,7 @@ else
   prefix = 'http://genesisblock.io/';
 
 
-if ( document.URL.indexOf('altmarket') != -1 ||document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
+if (  document.URL.indexOf('options') != -1 || document.URL.indexOf('altmarket') != -1 ||document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
 
 
 if (activated){
