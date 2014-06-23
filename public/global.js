@@ -123,7 +123,29 @@ string += substring;
 string += '</tbody></table></div>\
 </div>';
 
+
+middle_area = '<div class="index_col col-md-3 col-lg-3 col-sm-3 col-xs-3"><img style="height:50px" class="index_icon" src=\"' + prefix + '/img/trade_icon.png' +  '\">\
+  <h3 class=\"desc\">Live Trading </h3>\
+  <h5 class=\"col-md-12 desc\"> Trade in real-time with live updating prices so you never miss the action.</h5>\
+  </div>\
+  <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:80px; margin-top: 12px\" class=\"index_icon\"  src=\"' + prefix + '/img/low_fees.png' +  '\">\
+  <h3 class=\"desc\" style=\"margin-top: 10px\">No fees </h3>\
+  <h5 class=\"col-md-12 desc\"> We are currently not taking any trading fees! </h5>\
+  </div>\
+  <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:60px; margin-top: 25px\" class=\"index_icon\" src=\"' + prefix + '/img/lock_icon.png' +  '\">\
+  <h3 class=\"desc\">Security </h3>\
+  <h5 class=\"col-md-12 desc\"> GenesisBlock has been built with bitcoin security principles in mind. We utilise cold storage and strict firewalls.</h5>\
+  </div>\
+  <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:50px; margin-top:39px\" class=\"index_icon\" src=\"' + prefix + '/img/support_icon.png' +  '\">\
+  <h3 class=\"desc\">Great Support</h3>\
+  <h5 class=\"col-md-12 desc\"> Our support team handle customer queries throughout the day, never will you experience a long wait for a reply.</h5>\
+  </div>';
+$('#middle_area').append(middle_area);
 $('#bottom_area').append(string);
+
+
+
+
 
 
 
