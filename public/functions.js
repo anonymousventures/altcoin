@@ -297,7 +297,7 @@ return string;
 
 
 
-function generate_options_table(){
+function generate_options_table(flag){
 
 
 console.log(coin_data);
@@ -344,6 +344,8 @@ expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 141816
 
 coin_selection = '';
 
+coins = new Array("dogecoin", "litecoin");
+
 $.each(coins, function(key,val){
 
     sub = '<option coin_name="'+ val + '">' + val +'</option>';
@@ -384,6 +386,11 @@ $.each(coin_data, function(key,val){
 
 href_ticker = val.coin_one_ticker + '/btc/' + val.call_put + '/' + val.strike.toFixed(9) + '/' + val.expiration;
 href_title = val.coin_one_ticker.toUpperCase() + '/BTC/' + val.call_put + '/<br>' + val.strike.toFixed(9) + '/<br>' + val.expiration;
+if (flag)
+  flag_result = 'options_page_href2';
+else
+  flag_result = 'options_page_href';
+
 
 if (key%6 == 0){
 
@@ -414,7 +421,7 @@ substring = selection_string;
 substring += table_header;
 
 substring +='<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
         <td class="tab_td_order">' + val.last + '</td>\
         <td class="tab_td_order">' + val.bid + '</td>\
         <td class="tab_td_order">' + val.ask + '</td>\
@@ -430,9 +437,11 @@ console.log(substring);
 
 }
 
+
+
 else if (key%6 == 5)
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
         <td class="tab_td_order">' + val.last + '</td>\
         <td class="tab_td_order">' + val.bid + '</td>\
         <td class="tab_td_order">' + val.ask + '</td>\
@@ -445,7 +454,7 @@ substring = '<tr id="tab_row" style="margin-bottom: 30px">\
 
 else  
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="tab_td_order"><a class="options_page_href" ticker="' + href_ticker + '">' + href_title + '</td>\
+        <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
         <td class="tab_td_order">' + val.last + '</td>\
         <td class="tab_td_order">' + val.bid + '</td>\
         <td class="tab_td_order">' + val.ask + '</td>\
@@ -685,6 +694,48 @@ function format_time(time){
     return expiration_time;
 
 }
+
+
+
+function add_options_table_handlers(){
+
+
+
+
+    $('.select_coin').change(function() {
+        coin_name = $(this).val();
+        $('.select_coin').val(coin_name);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+        expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+    $('html, body').animate({
+        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+    }, 1000);
+
+
+    });
+
+        $('.select_expiration').change(function() {
+        coin_name = $('.select_coin').val();
+        $('.select_coin').val(coin_name);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+        expiration_time = $('option:selected', $(this)).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+    $('html, body').animate({
+        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+    }, 1000);
+
+
+    });
+
+
+}
+
+
+
+
 
 
 

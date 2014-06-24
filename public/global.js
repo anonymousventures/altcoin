@@ -154,43 +154,53 @@ $('#bottom_area').append(string);
 
 if (document.URL.indexOf('options') != -1){
 
-string = generate_options_table();
+string = generate_options_table(false);
 $('#trading_table').append(string);
 
+add_options_table_handlers();
 
      $("a.options_page_href").on("click",function(){
          ticker = $(this).attr("ticker");
          window.open(prefix + 'optmarket/' + ticker ,'_blank');
      });
 
+$.ajax({
+  url: "/append_options",
+  type: "POST",
+  data: '',
+  dataType: "html"
+}).done(function(data){
 
-    $('.select_coin').change(function() {
-        coin_name = $(this).val();
-        $('.select_coin').val(coin_name);
-        //expiration_time = $('.select_expiration').attr('expiration_time');
-        expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
-        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
-
-    $('html, body').animate({
-        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
-    }, 1000);
-
-
-    });
-
-        $('.select_expiration').change(function() {
-        coin_name = $('.select_coin').val();
-        $('.select_coin').val(coin_name);
-        //expiration_time = $('.select_expiration').attr('expiration_time');
-        expiration_time = $('option:selected', $(this)).attr('expiration_time');
-        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
-
-    $('html, body').animate({
-        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
-    }, 1000);
+//alert(data.coins);
+data = $.parseJSON(data);
+console.log(data);
+console.log(data.coins);
 
 
-    });
+activated = data.activated;
+user = data.user;
+coin_data = data.coin_data;
+coins = data.coins;
+
+
+//alert(coin_data);
+
+string2 = generate_options_table(true);
+$('#trading_table').append(string2);
+
+add_options_table_handlers();
+
+
+     $("a.options_page_href2").on("click",function(){
+         ticker = $(this).attr("ticker");
+         window.open(prefix + 'optmarket/' + ticker ,'_blank');
+     });
+
+//alert(data);
+
+
+});
+
 
 
 

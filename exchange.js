@@ -323,7 +323,8 @@ var OrderData = new mongoose.Schema({
     strike: Number,
     expiration: Number,
     price: Number,
-    quantity: Number
+    quantity: Number,
+    swap: Boolean
     });
 
 var Coin = new mongoose.Schema({
@@ -995,9 +996,12 @@ chart_array.push(subobject);
 
 
 });
-if (pending_asks.length == 0)
+
+
+
+if (pending_asks == '')
     pending_asks = null;
-if (pending_bids.length == 0 )
+if (pending_bids == '')
     pending_bids = null;
 
 console.log('\r\n');
@@ -1264,7 +1268,7 @@ bid_price = getRandomArbitrary(.05, .25);
                             short_symbol: 'BUSD' + (i%78 + 1),
                             price: bid_price,
                             quantity: bid_quantity,
-                            initial_margin: .3
+                            initial_margin: .3,
         });
 
         order_data.save(function(err){
@@ -1868,6 +1872,7 @@ if (!complete ){
                             short_symbol: short_symbol,
                             price: ask_price,
                             quantity: bid_quantity_left,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -1965,7 +1970,8 @@ if (!complete ){
                             time: time,
                             short_symbol: short_symbol,
                             price: ask_price,
-                            quantity: ask_quantity_left
+                            quantity: ask_quantity_left,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -2327,7 +2333,8 @@ if (!complete ){
                             strike: strike,
                             expiration: expiration,
                             price: ask_price,
-                            quantity: bid_quantity
+                            quantity: bid_quantity,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -2428,6 +2435,7 @@ if (!complete ){
                             quantity: ask_quantity_left,
                             strike: strike,
                             expiration: expiration,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -2835,7 +2843,8 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             price: bid_price,
                             quantity: ask_quantity,
                             strike: strike,
-                            expiration: expiration
+                            expiration: expiration,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -2938,6 +2947,7 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             quantity: bid_quantity_left,
                             strike: strike,
                             expiration: expiration,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -5730,6 +5740,7 @@ array = new Array();
 Coin.find().distinct('coin_name', function(err, coins) {
 
 coins.splice( $.inArray('bitcoin', coins), 1 );
+coins.splice( $.inArray('litecoin', coins), 1 );
 console.log(coins);
 
 Coin.aggregate( 
@@ -5781,7 +5792,9 @@ OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: va
 OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
 OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
-Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+//Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+
+orders_within_day = [];
 
 var bid_price;
 var ask_price;
@@ -5901,6 +5914,242 @@ res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringi
 }
 
 
+//});
+});
+});
+});
+});
+});
+})(keyc, valc);
+});
+
+
+
+
+})(key,val, keyb, valb);
+
+});
+});
+
+
+
+
+  });
+
+
+
+
+
+});
+
+
+});
+
+
+
+
+
+
+
+app.post('/append_options', function(req,res){
+
+
+expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+
+// current_prices = new Object();
+// current_prices.ltc = .016;
+// current_prices.doge = 0.0000005;
+
+
+
+
+ // db.images.aggregate( 
+ //       {$match   : {hashtag: {$in:["tag1","tag2"]}}}, 
+ //       {$group   : {_id:"$hashtag", name: {$first:"$name"}}},
+ //       {$project : {hashtag:"$_id", name: "$name", _id:0}}
+ //  )
+
+current_time = new Date().getTime()/1000;
+one_day_ago = current_time - (60 * 60 * 24 * 1000);
+
+array = new Array();
+Coin.find().distinct('coin_name', function(err, coins) {
+
+coins.splice( $.inArray('bitcoin', coins), 1 );
+coins.splice( $.inArray('dogecoin', coins), 1 );
+console.log(coins);
+
+Coin.aggregate( 
+       {$match   : {coin_name: {$in: coins }}}, 
+       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+  ).exec(function(err, result){
+
+
+    // ids is an array of all ObjectIds
+
+
+
+$.each(result, function(key,val){
+
+$.each(expiration_times, function(keyb,valb){
+
+
+(function(key,val,keyb, valb){
+
+if (val.code == 'ltc')
+current_price = .016;
+if (val.code == 'doge')
+current_price = 0.0000005;
+
+price_deviation = current_price/10;
+starting = current_price - 3 * price_deviation;
+
+prices = new Array();
+
+for (var i=0; i < 6; i++){
+    
+    price = starting + i * price_deviation;
+    prices.push(price);
+
+}
+
+
+
+$.each(prices, function(keyc, valc){
+
+console.log('fucking price ' + valc);
+
+(function(keyc,valc){    
+Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+
+orders_within_day = [];
+
+var bid_price;
+var ask_price;
+
+console.log('stupid' + val.coin_name + ' ' + valb + ' ' + orders_within_day)
+
+if (bid == null)
+bid_price = 'n/a';
+else
+bid_price = bid.price;
+
+
+if (ask == null)
+ask_price = 'n/a';
+else
+ask_price = ask.price;
+
+console.log('da bid ' + bid_price);
+
+volume = 0;
+$.each(orders_within_day, function(key,val){
+
+volume += (val.quantity - val.quantity_left);
+
+});
+
+volume = volume/2;
+
+console.log('im confused ' + valc);
+
+obj = new Object();
+obj.coin_one_name = val.coin_name;
+obj.coin_two_name = 'bitcoin';
+obj.coin_one_ticker = val.code;
+obj.coin_two_ticker = 'btc';
+obj.bid = bid_price;
+obj.ask = ask_price;
+
+if (lowest_order == null){
+obj.low = 0;
+obj.high = 0;
+obj.last = 0;
+}
+else{
+obj.low = lowest_order.price;
+obj.high = highest_order.price;
+obj.last = last_order.price;
+}
+
+obj.volume = volume;
+obj.expiration = valb;
+obj.strike = valc;
+obj.call_put = 'CALL';
+
+console.log(valb);
+
+array.push(obj);
+
+if (array.length == coins.length * 4 * 6){
+
+
+//sorting functions
+function dynamicSort(property) { 
+    return function (obj1,obj2) {
+        return obj1[property] > obj2[property] ? 1
+            : obj1[property] < obj2[property] ? -1 : 0;
+    }
+}
+
+function dynamicSortMultiple() {
+    /*
+     * save the arguments object as it will be overwritten
+     * note that arguments object is an array-like object
+     * consisting of the names of the properties to sort by
+     */
+    var props = arguments;
+    return function (obj1, obj2) {
+        var i = 0, result = 0, numberOfProperties = props.length;
+        /* try getting a different result from 0 (equal)
+         * as long as we have extra properties to compare
+         */
+        while(result === 0 && i < numberOfProperties) {
+            result = dynamicSort(props[i])(obj1, obj2);
+            i++;
+        }
+        return result;
+    }
+}
+
+array.sort(dynamicSortMultiple("coin_one_name","expiration", "strike"));
+
+console.log(array);
+
+// modified_array = new Array();
+// $.each(array, function(key,val){
+
+
+
+
+// });
+
+activated = req.session.activated;
+user = req.session.user;
+
+console.log('status ' + activated);
+
+if (activated != true)
+    activated = false;
+if (user == undefined)
+    user = null;
+
+console.log('later status ' + activated);
+
+console.log('this array ' + JSON.stringify(array));
+res.json({coins: coins ,coin_data: array, user: user, activated: activated});
+
+}
+
+
 });
 });
 });
@@ -5931,6 +6180,12 @@ res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringi
 
 
 });
+
+
+
+
+
+
 
 
 
@@ -6093,6 +6348,17 @@ res.render('trading.html', {activated: JSON.stringify(activated), user: JSON.str
 
 
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 
