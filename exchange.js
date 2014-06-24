@@ -5658,10 +5658,20 @@ obj.coin_one_ticker = val.code;
 obj.coin_two_ticker = 'btc';
 obj.bid = bid_price;
 obj.ask = ask_price;
+
+if (lowest_order == null){
+obj.low = 0;
+obj.high = 0;
+obj.last = 0;
+obj.volume = 0;
+
+}
+else{
 obj.low = lowest_order.price;
 obj.high = highest_order.price;
 obj.last = last_order.price;
 obj.volume = volume;
+}
 
 array.push(obj);
 
