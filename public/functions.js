@@ -559,12 +559,12 @@ function add_options_price_handlers(){
       var flagged_balance;
 
       if (kind == 'CALL'){
-        margin_requirement = (ask_quantity * 1).toFixed(9);
+        margin = (ask_quantity * 1).toFixed(9);
         flagged_balance = coin_one_balance;
 
       }
       else{
-        margin_requirement = (ask_quantity * strike).toFixed(9);
+        margin = (ask_quantity * strike).toFixed(9);
         flagged_balance = coin_two_balance;
       }
 
@@ -572,9 +572,9 @@ function add_options_price_handlers(){
       $('#sell_total').html( (ask_quantity * ask_price).toFixed(9) );
       $('#sell_fee').html( (0).toFixed(9) );
       $('.netTotalSell').html( (ask_quantity * ask_price * 1).toFixed(9) );
-      $('#margin_requirement').html( margin_requirement );
+      $('#margin_requirement').html( margin );
 
-      margin = ask_quantity;
+      //margin = ask_quantity;
 
       total =  margin;
 
@@ -601,12 +601,12 @@ function add_options_price_handlers(){
       var flagged_balance;
 
       if (kind == 'CALL'){
-        margin_requirement = (ask_quantity * 1).toFixed(9);
+        margin = (ask_quantity * 1).toFixed(9);
         flagged_balance = coin_one_balance;
 
       }
       else{
-        margin_requirement = (ask_quantity * strike).toFixed(9);
+        margin = (ask_quantity * strike).toFixed(9);
         flagged_balance = coin_two_balance;
       }
 
@@ -614,9 +614,9 @@ function add_options_price_handlers(){
       $('#sell_total').html( (ask_quantity * ask_price).toFixed(9) );
       $('#sell_fee').html( (0).toFixed(9) );
       $('.netTotalSell').html( (ask_quantity * ask_price * 1).toFixed(9) );
-      $('#margin_requirement').html( margin_requirement);
+      $('#margin_requirement').html( margin);
 
-      margin = ask_quantity;
+      //margin = ask_quantity;
 
       total = margin;
 

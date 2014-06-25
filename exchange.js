@@ -2117,6 +2117,11 @@ expiration = req.body.expiration;
 strike = parseFloat(req.body.strike).toFixed(9);
 call_put = req.body.call_put;
 
+if (call_put == 'CALL')
+call = true;
+else
+call = false;
+
 
 console.log('dastrike ' + strike);
 console.log(call_put);
@@ -2132,7 +2137,7 @@ console.log('bid price ' + bid_price);
 //res.end('done');
 
 
-Order.find({$and: [{expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'ask'}, {pending: 'pending'}, {price: {$lte: bid_price}}]}).populate('user').sort({time: 1}).exec(function(err, ask){
+Order.find({$and: [{call_put: call_put}, {expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'ask'}, {pending: 'pending'}, {price: {$lte: bid_price}}]}).populate('user').sort({time: 1}).exec(function(err, ask){
 
 console.log('ask ' + ask)
 //console.log('sell ordera ' + sell_order);
@@ -2164,7 +2169,11 @@ if (ask.length == 0 && quantity > min_order){
 console.log("it is in here lol");
 
 function callback(){}
+
 coin[coin_two_name].update({$inc: {in_orders: bid_quantity * bid_price, balance: -1 * bid_quantity * bid_price, available_balance: -1 * bid_quantity * bid_price}}, { w: 1 }, callback);
+
+
+
 //, in_orders_non_margin: bid_quantity * bid_price
 
 User.findOne({email: req.session.user.email}, function(err, user){
@@ -2334,7 +2343,8 @@ if (!complete ){
                             expiration: expiration,
                             price: ask_price,
                             quantity: bid_quantity,
-                            swap: false
+                            swap: false,
+                            call_put: call_put
         });
 
         order_data.save(function(err){
@@ -2377,15 +2387,21 @@ if (!complete ){
             console.log('buy quantity left ' + bid_quantity_left);
             console.log('buy value left ' + bid_value_left);
 
-            seller[coin_one_name].update({$inc: {in_orders: -1 * bid_quantity_left,  in_positions: bid_quantity_left}}, { w: 1 }, function(err){
+        purchase_cost = bid_quantity_left * val.price;
+        seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * purchase_cost, available_balance: purchase_cost, balance: purchase_cost}}, { w: 1 }, function(err){
 
-                purchase_cost = bid_quantity_left * val.price;
-                seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * purchase_cost, available_balance: purchase_cost, balance: purchase_cost}}, { w: 1 }, function(err){
-
-                    req.session.processing = false;
-                    res.end('done');
-
+            if (call)
+                seller[coin_one_name].update({$inc: {in_orders: -1 * bid_quantity_left,  in_positions: bid_quantity_left}}, { w: 1 }, function(err){
+                        req.session.processing = false;
+                        res.end('done');
                 });
+            else
+                seller[coin_two_name].update({$inc: {in_orders: -1 * bid_quantity_left * strike,  in_positions: bid_quantity_left * strike}}, { w: 1 }, function(err){
+                        req.session.processing = false;
+                        res.end('done');
+                });
+
+
 
             });
 
@@ -2437,7 +2453,8 @@ if (!complete ){
                             quantity: ask_quantity_left,
                             strike: strike,
                             expiration: expiration,
-                            swap: false
+                            swap: false,
+                            call_put: call_put
         });
 
         order_data.save(function(err){
@@ -2545,13 +2562,21 @@ if (!complete ){
 
         //update balance on seller
         User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, seller){
-            seller[coin_one_name].update({$inc: {in_orders: -1 * ask_quantity_left, in_positions: ask_quantity_left}}, { w: 1 }, function(err){
 
-                seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * ask_value, available_balance: ask_value, balance: ask_value}}, { w: 1 }, function(err){
 
-                    req.session.processing = false;
-                    res.end('done');
-                });
+            seller[coin_two_name].update({$inc: {in_orders_non_margin: -1 * ask_value, available_balance: ask_value, balance: ask_value}}, { w: 1 }, function(err){
+
+                if (call)
+                    seller[coin_one_name].update({$inc: {in_orders: -1 * ask_quantity_left, in_positions: ask_quantity_left}}, { w: 1 }, function(err){
+                            req.session.processing = false;
+                            res.end('done');
+                        });
+                else
+                    seller[coin_two_name].update({$inc: {in_orders: -1 * ask_quantity_left * strike, in_positions: ask_quantity_left * strike}}, { w: 1 }, function(err){
+                            req.session.processing = false;
+                            res.end('done');
+                    });
+
 
             });
 
@@ -2560,9 +2585,6 @@ if (!complete ){
 
 
     }
-
-
-
 
 
 
@@ -2632,7 +2654,16 @@ coin_two_ticker = req.body.coin_ticker_two;
 expiration = req.body.expiration;
 strike = req.body.strike;
 call_put = req.body.call_put;
-margin = parseFloat(req.body.margin);
+//margin = parseFloat(req.body.margin);
+
+if (call_put == 'CALL'){
+call = true;
+margin = ask_quantity;
+}
+else{
+call = false;
+margin = ask_quantity * strike;
+}
 
 console.log('coinone' + coin_one_name);
 
@@ -2642,7 +2673,7 @@ console.log(coin_two_ticker);
 //coin_two_ticker = 'btc';
 //price = 100;
 
-Order.find({$and: [{expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'bid'}, {pending: 'pending'}, {price: {$gte: ask_price}}]}).populate('user').sort({time: 1}).exec(function(err, bid){
+Order.find({$and: [{call_put: call_put}, {expiration_time: expiration}, {strike: strike}, {swap: false}, {coin_one_ticker: coin_one_ticker}, {coin_two_ticker: coin_two_ticker}, {side: 'bid'}, {pending: 'pending'}, {price: {$gte: ask_price}}]}).populate('user').sort({time: 1}).exec(function(err, bid){
 
 //console.log('sell ordera ' + sell_order);
 //console.log('sell orderb ' + sell_order['user']);
@@ -2656,7 +2687,12 @@ User.findOne({email: req.session.user.email}).populate(coin_one_name + ' ' + coi
 //Coin.findOne({code: coin_one_ticker}, function(err, coin){
 min_order = .00001;
 
+if (call)
 balance = coin[coin_one_name].balance;
+else
+balance = coin[coin_two_name].balance;
+
+
 ask_value = ask_price * ask_quantity;
 total =  margin;
 
@@ -2672,8 +2708,15 @@ console.log('inside');
 if (bid.length == 0 && ask_quantity > min_order){
 
 function callback(){}
-coin[coin_one_name].update({$inc: {available_balance: -1 * total, balance: -1 * total, in_orders: margin}}, { w: 1 }, callback);
+
 coin[coin_two_name].update({$inc: {in_orders_non_margin: ask_value}}, { w: 1 }, callback);
+
+if (call)
+coin[coin_one_name].update({$inc: {available_balance: -1 * total, balance: -1 * total, in_orders: margin}}, { w: 1 }, callback);
+else
+coin[coin_two_name].update({$inc: {available_balance: -1 * total, balance: -1 * total, in_orders: margin}}, { w: 1 }, callback);
+
+
 
 
 console.log("it is in here lol");
@@ -2782,8 +2825,15 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         console.log('yolob '  + key + ' ' + sell_price);
         //console.log('sell price ' + key + ' ' + sell _price);
 
-        user[coin_one_name].update({$inc: {in_positions: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left}}, { w: 1 }, callback);
+        //update  user's bitcoin balance for both
         user[coin_two_name].update({$inc: {available_balance: sell_price, balance: sell_price}}, { w: 1 }, callback);
+
+        if (call)
+        user[coin_one_name].update({$inc: {in_positions: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left}}, { w: 1 }, callback);
+        else
+        user[coin_two_name].update({$inc: {in_positions: ask_quantity_left * strike, available_balance: -1 * ask_quantity_left * strike, balance: -1 * ask_quantity_left * strike}}, { w: 1 }, callback);
+
+
 
         function callback(){}
         //done updating buyer balance
@@ -2847,7 +2897,8 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             quantity: ask_quantity,
                             strike: strike,
                             expiration: expiration,
-                            swap: false
+                            swap: false,
+                            call_put: call_put
         });
 
         order_data.save(function(err){
@@ -2934,9 +2985,15 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         console.log('bid price ' + bid_price);
         console.log('sell price ' + sell_price);
 
-        //update asker's balance
-        user[coin_one_name].update({$inc: {in_positions: bid_quantity_left, available_balance: -1 * bid_quantity_left, balance: -1 * bid_quantity_left}}, { w: 1 }, callback);
+        //update asker's bitcoin balance
         user[coin_two_name].update({$inc: {available_balance: sell_price, balance: sell_price}}, { w: 1 }, callback);
+
+        if (call)
+        user[coin_one_name].update({$inc: {in_positions: bid_quantity_left, available_balance: -1 * bid_quantity_left, balance: -1 * bid_quantity_left}}, { w: 1 }, callback);
+        else
+        user[coin_two_name].update({$inc: {in_positions: bid_quantity_left * strike, available_balance: -1 * bid_quantity_left * strike, balance: -1 * bid_quantity_left * strike}}, { w: 1 }, callback);
+
+
         //done updating  asker's balance
 
         time = new Date().getTime();
@@ -2950,7 +3007,8 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
                             quantity: bid_quantity_left,
                             strike: strike,
                             expiration: expiration,
-                            swap: false
+                            swap: false,
+                            call_put: call_put
         });
 
         order_data.save(function(err){
@@ -2965,8 +3023,15 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
             function callback(err){ console.log('errorhi ' + err)}
             console.log('ovahere ' + user[coin_two_name]);
 
-            user[coin_one_name].update({$inc: {in_orders: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left }}, { w: 1 }, callback);
+            //update seller's net orders info for balance page
             user[coin_two_name].update({$inc: {in_orders_non_margin: ask_quantity_left * ask_price}}, { w: 1 }, callback);
+
+            if (call)
+            user[coin_one_name].update({$inc: {in_orders: ask_quantity_left, available_balance: -1 * ask_quantity_left, balance: -1 * ask_quantity_left }}, { w: 1 }, callback);
+            else
+            user[coin_two_name].update({$inc: {in_orders: ask_quantity_left * strike, available_balance: -1 * ask_quantity_left * strike, balance: -1 * ask_quantity_left * strike }}, { w: 1 }, callback);
+
+
 
 
             order = new Order({
@@ -5337,7 +5402,6 @@ in_positions = val.quantity - val.quantity_left;
 if (in_positions > 0 && val.pending != 'exercised' && val.pending != 'expired'){
 
 
-
 console.log(val);
 
 
@@ -5472,6 +5536,8 @@ console.log(user);
 OrderData.find({}).sort('-time').limit(5).exec(function(err, orderdata){
 Order.find({$and: [{pending: 'pending'}, {side: 'bid'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, bids){
 Order.find({$and: [{pending: 'pending'}, {side: 'ask'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, asks){
+
+console.log(orderdata);
 
 res.render('index_exchange.html', {activated: JSON.stringify(activated), user: JSON.stringify(user),asks: JSON.stringify(asks),bids: JSON.stringify(bids), orderdata: JSON.stringify(orderdata)});
 
@@ -6523,11 +6589,19 @@ app.post('/exercise_option', function(req,res){
 console.log('here');
 Order.findByIdAndUpdate(req.body.order_id, { $set: {pending: 'exercised'}}).populate('opposing_orders user opposing_users').exec( function(err, order){
 
+if (order.call_put == 'CALL')
+    call = true;
+else
+    call = false;
+
+//make sure person has the right to exercise the option
+if (order.side == 'bid'){
+
 
 //see if user has enough money
 
 
-
+if (call){
 //update buyers money
 console.log('ugh');
 total = order.quantity - order.quantity_left;
@@ -6541,7 +6615,8 @@ if (total_cost <= available_balance){
 
 User.findOne({email: req.session.user.email}).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
 
-user[order.coin_two_name].update({$inc: {balance: -1 * total * order.price, available_balance: -1 * total * order.price}}).exec();
+
+user[order.coin_two_name].update({$inc: {balance: -1 * total * order.strike, available_balance: -1 * total * order.strike}}).exec();
 user[order.coin_one_name].update({$inc: {balance: total, available_balance: total}}).exec();
 
 
@@ -6550,7 +6625,7 @@ user[order.coin_one_name].update({$inc: {balance: total, available_balance: tota
 $.each(order.opposing_users, function(key, val){
 
 opposing_quantity = order.opposing_quantities[key];
-opposing_gain = opposing_quantity * order.price;
+opposing_gain = opposing_quantity * order.strike;
 
 User.findById(val).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
 
@@ -6573,60 +6648,72 @@ res.end('done');
 }
 
 });
+}
+else{
 
 
-// Coin.findByIdAndUpdate({coin_name: order.coin_one_name}, {$inc: {balance: total, available_balance: total}}, function(err, coin){
+//update buyers money
+console.log('ugh');
+total = order.quantity - order.quantity_left;
+total_cost = total * order.strike;
 
-// console.log(coin);
+Coin.findOne(order.user[coin_one_name]).exec(function(err, coin){
 
-// });
-// console.log('ugh');
+available_balance = coin.available_balance;
 
-// console.log(order._id);
-// bid_total_quantity = order.quantity;
+if (total_cost <= available_balance){
 
-// ask_total = 0;
-// $.each(order.opposing_orders, function(key, val){
-
-// if (key != order.opposing_orders.length-1 ){
-//     //console.log(key);
-//     ask_total += val.quantity;
-//     console.log(val.quantity);
-
-// Order.findByIdAndUpdate(val._id, { $set: {pending: 'exercised'}}, function(err, order){
+User.findOne({email: req.session.user.email}).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
 
 
-// });
-
-
-
-// }
-// else{
-//     //console.log('hi ' + key);
-//     console.log('here ' + ask_total);
-// left = bid_total_quantity - ask_total;
-// console.log(left);
-
-// Order.findByIdAndUpdate(val._id, {$inc: {quantity: -1 * left}}, function(err, order){
-
-
-// });
-
-
-// }
-
-
-// });
+user[order.coin_two_name].update({$inc: {balance: total * order.strike, available_balance: total * order.strike}}).exec();
+user[order.coin_one_name].update({$inc: {balance: -1 * total, available_balance: -1 * total}}).exec();
 
 
 });
 
-/*
-Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'exercised'}}, function(err, order){
+$.each(order.opposing_users, function(key, val){
 
-console.log("order exercised");
-res.end("done");
-});*/
+opposing_quantity = order.opposing_quantities[key];
+opposing_loss = opposing_quantity * order.strike;
+
+User.findById(val).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
+
+user[order.coin_one_name].update({$inc: {in_positions: -1 * opposing_quantity }}).exec();
+user[order.coin_two_name].update({$inc: {balance: -1 * opposing_loss, available_balance: -1 * opposing_loss}}).exec();
+
+res.end('done');
+
+
+});
+
+
+
+
+});
+
+
+
+
+}
+
+});
+
+
+
+
+
+}
+
+
+
+
+
+
+
+}
+
+});
 
 
 });

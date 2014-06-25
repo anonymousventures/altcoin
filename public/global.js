@@ -1813,7 +1813,7 @@ $.each(orders, function(key,val){
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
   //console.log('ah ' + JSON.stringify(val));
-if (val.swap == false && (val.side == 'bid' && val.pending == 'complete' || (val.pending == 'cancelled' && val.quantity != val.quantity_left) || (val.pending == 'pending' && (val.quantity != val.quantity_left))) ){
+if (val.swap == false && val.side == 'bid' && (val.pending == 'complete' || (val.pending == 'cancelled' && val.quantity != val.quantity_left) || (val.pending == 'pending' && (val.quantity != val.quantity_left))) ){
 
   //console.log('ah ' + JSON.stringify(val));
 if (val.side == 'ask')
