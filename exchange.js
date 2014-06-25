@@ -2927,6 +2927,17 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
 
 
 
+        //update balance on bidder
+        User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
+
+            //sell_price = bid_quantity_left * bid_price;
+            buyer[coin_two_name].update({$inc: {in_orders: -1 * sell_price}}, { w: 1 }, function(err){
+
+                    req.session.processing_sell = false;
+                    res.end('done');
+
+            });
+        });
 
 
         //console.log('sell order user ' + sell_order);
@@ -3096,19 +3107,18 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         });
 
         //update balance on bidder
-        //User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
-            // buyer[coin_one_name].update({$inc: {available_balance: bid_quantity_left, balance: bid_quantity_left}}, { w: 1 }, function(err){
+        User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
 
-            //     //sell_price = bid_quantity_left * bid_price;
-            //     buyer[coin_two_name].update({$inc: {in_orders_non_margin: -1 * sell_price, balance: -1 * sell_price}}, { w: 1 }, function(err){
-                    // req.session.processing_sell = false;
-                    // res.end('done');
-            //     });
+            //sell_price = bid_quantity_left * bid_price;
+            buyer[coin_two_name].update({$inc: {in_orders:  -1 * sell_price}}, { w: 1 }, function(err){
 
-            // });
+                    req.session.processing_sell = false;
+                    res.end('done');
+
+            });
+        });
 
 
-        //});
 
 
     }
@@ -6645,7 +6655,7 @@ res.end('done');
 
 
 
-}
+}else res.end('Not enough balance');
 
 });
 }
@@ -6679,8 +6689,8 @@ opposing_loss = opposing_quantity * order.strike;
 
 User.findById(val).populate(order.coin_one_name + ' bitcoin').exec(function(err, user){
 
-user[order.coin_one_name].update({$inc: {in_positions: -1 * opposing_quantity }}).exec();
-user[order.coin_two_name].update({$inc: {balance: -1 * opposing_loss, available_balance: -1 * opposing_loss}}).exec();
+user[order.coin_one_name].update({$inc: {balance: opposing_quantity, available_balance: opposing_quantity }}).exec();
+user[order.coin_two_name].update({$inc: {in_positions:-1 * opposing_loss}}).exec();
 
 res.end('done');
 
@@ -6695,7 +6705,7 @@ res.end('done');
 
 
 
-}
+}else res.end('Not enough balance');
 
 });
 

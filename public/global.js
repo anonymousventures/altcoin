@@ -1672,14 +1672,14 @@ processed = val.quantity - val.quantity_left;
 //var status = '';
 
 
-if (val.pending == 'complete' || val.pending == 'pending' || val.pending == 'cancelled')
+if (val.pending == 'pending' || val.pending == 'cancelled')
 status = 'NOT EXERCISED YET';
 else if (val.pending == 'expired')
 status = 'EXPIRED';
 else status = 'EXERCISED';
 
 
-if ( (val.quantity == val.quantity_original || val.side == 'bid')  && val.swap == false ){
+if ( (val.quantity == val.quantity_original )  && val.swap == false ){
 substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val._id + '</td>\
         <td class="tab_td_order">' + val.call_put + '</td>\
@@ -3621,7 +3621,9 @@ order_id = $(this).attr('order_id');
         dataType: "html"
       }).done(function(data){
 
+        if (data == 'done')
         $('a[order_id=\'' + order_id + '\']').parent().parent().remove();
+        else alert('Not enough balance');
         //alert('Order Cancelled');
 
       });
