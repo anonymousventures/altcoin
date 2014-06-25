@@ -364,8 +364,21 @@ expiration_time = format_time(val);
 });
 
 
+
+option_types = new Array("CALL", "PUT");
+option_selection = '';
+
+$.each(option_types, function(key,val){
+    sub = '<option call_put="'+ val + '">' + val +'</option>';
+    option_selection += sub;
+})
+
+
+
 selection_string = '<span style="text-align: left; margin-left: 0px !important">Select coin:</span>\
  <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+   <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
+ <br> <select class="form-control select_option" style="width:300px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
  <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
 
@@ -398,7 +411,7 @@ console.log('in here' + key);
 
 
 table_header = '<table class="table table-bordered"  style="margin-bottom:50px">\
-        <thead key="' + key + '" coin_name_anchor="' + val.coin_one_name  +'" expiration_time_anchor="' + val.expiration +'">\
+        <thead key="' + key + '" call_put_anchor="' + val.call_put + '" coin_name_anchor="' + val.coin_one_name  +'" expiration_time_anchor="' + val.expiration +'">\
           <tr>\
             <th>Market</th>\
             <th>Last Trading<br> Price</th>\
@@ -414,6 +427,8 @@ table_header = '<table class="table table-bordered"  style="margin-bottom:50px">
 
 selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
  <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+    <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
+ <br> <select class="form-control select_option" style="width:300px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
  <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
 
@@ -730,12 +745,17 @@ function add_options_table_handlers(){
     $('.select_coin').change(function() {
         coin_name = $(this).val();
         $('.select_coin').val(coin_name);
+
+
+        option_type = $('option:selected', $('.select_option')).attr('call_put');
+        $('.select_option').find('option[call_put="' + option_type +'"]').attr("selected",true);
+
         //expiration_time = $('.select_expiration').attr('expiration_time');
         expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
         $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
 
     $('html, body').animate({
-        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+        scrollTop: $('[call_put_anchor="' + option_type + '"][coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 300
     }, 1000);
 
 
@@ -745,15 +765,45 @@ function add_options_table_handlers(){
         coin_name = $('.select_coin').val();
         $('.select_coin').val(coin_name);
         //expiration_time = $('.select_expiration').attr('expiration_time');
+        option_type = $('option:selected', $('.select_option')).attr('call_put');
+        $('.select_option').find('option[call_put="' + option_type +'"]').attr("selected",true);
+
         expiration_time = $('option:selected', $(this)).attr('expiration_time');
         $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
 
+
+
     $('html, body').animate({
-        scrollTop: $('[coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 200
+        scrollTop: $('[call_put_anchor="' + option_type + '"][coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 300
     }, 1000);
 
 
     });
+
+
+
+        $('.select_option').change(function() {
+        option_type = $(this).val();
+        $('.select_option').val(option_type);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+
+        coin_name = $('option:selected', $('.select_coin')).attr('coin_name');
+        $('.select_coin').find('option[coin_name="' + coin_name +'"]').attr("selected",true);
+
+        expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+
+
+    $('html, body').animate({
+        scrollTop: $('[call_put_anchor="' + option_type + '"][coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 300
+    }, 1000);
+
+
+    });
+
+
+
 
 
 }

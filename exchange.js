@@ -5809,23 +5809,14 @@ app.get('/options', function(req,res){
 
 expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
 
-// current_prices = new Object();
-// current_prices.ltc = .016;
-// current_prices.doge = 0.0000005;
-
-
-
-
- // db.images.aggregate( 
- //       {$match   : {hashtag: {$in:["tag1","tag2"]}}}, 
- //       {$group   : {_id:"$hashtag", name: {$first:"$name"}}},
- //       {$project : {hashtag:"$_id", name: "$name", _id:0}}
- //  )
 
 current_time = new Date().getTime()/1000;
 one_day_ago = current_time - (60 * 60 * 24 * 1000);
 
 array = new Array();
+option_types = new Array("CALL", "PUT");
+
+
 Coin.find().distinct('coin_name', function(err, coins) {
 
 coins.splice( $.inArray('bitcoin', coins), 1 );
@@ -5870,17 +5861,20 @@ for (var i=0; i < 6; i++){
 
 
 $.each(prices, function(keyc, valc){
+$.each(option_types, function(keyd, vald){
+
+
 
 console.log('fucking price ' + valc);
 
-(function(keyc,valc){    
-Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
-Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+(function(keyc,valc,keyd,vald){    
+Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 //Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
 orders_within_day = [];
@@ -5936,13 +5930,13 @@ obj.last = last_order.price;
 obj.volume = volume;
 obj.expiration = valb;
 obj.strike = valc;
-obj.call_put = 'CALL';
+obj.call_put = vald;
 
 console.log(valb);
 
 array.push(obj);
 
-if (array.length == coins.length * 4 * 6){
+if (array.length == coins.length * 4 * 6 * 2){
 
 
 //sorting functions
@@ -5973,7 +5967,7 @@ function dynamicSortMultiple() {
     }
 }
 
-array.sort(dynamicSortMultiple("coin_one_name","expiration", "strike"));
+array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
 
 console.log(array);
 
@@ -6009,7 +6003,8 @@ res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringi
 });
 });
 });
-})(keyc, valc);
+})(keyc, valc, keyd,vald);
+});
 });
 
 
@@ -6060,6 +6055,8 @@ expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 141816
 
 current_time = new Date().getTime()/1000;
 one_day_ago = current_time - (60 * 60 * 24 * 1000);
+option_types = new Array("CALL", "PUT");
+
 
 array = new Array();
 Coin.find().distinct('coin_name', function(err, coins) {
@@ -6106,18 +6103,20 @@ for (var i=0; i < 6; i++){
 
 
 $.each(prices, function(keyc, valc){
+$.each(option_types, function(keyd, vald){
+
 
 console.log('fucking price ' + valc);
 
-(function(keyc,valc){    
-Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
-Order.findOne({$and: [{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+(function(keyc,valc,keyd,vald){    
+Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+Order.findOne({$and: [{call_put: vald},{strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+OrderData.findOne({$and:[{call_put: vald},{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+OrderData.findOne({$and:[{call_put: vald},{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-OrderData.findOne({$and:[{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
-Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+OrderData.findOne({$and:[{call_put: vald},{strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.find({$and:[{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
 orders_within_day = [];
 
@@ -6172,13 +6171,13 @@ obj.last = last_order.price;
 obj.volume = volume;
 obj.expiration = valb;
 obj.strike = valc;
-obj.call_put = 'CALL';
+obj.call_put = vald;
 
 console.log(valb);
 
 array.push(obj);
 
-if (array.length == coins.length * 4 * 6){
+if (array.length == coins.length * 4 * 6 * 2){
 
 
 //sorting functions
@@ -6209,7 +6208,7 @@ function dynamicSortMultiple() {
     }
 }
 
-array.sort(dynamicSortMultiple("coin_one_name","expiration", "strike"));
+array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
 
 console.log(array);
 
@@ -6245,7 +6244,8 @@ res.json({coins: coins ,coin_data: array, user: user, activated: activated});
 });
 });
 });
-})(keyc, valc);
+})(keyc, valc, keyd,vald);
+});
 });
 
 
