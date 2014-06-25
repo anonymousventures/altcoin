@@ -679,11 +679,11 @@ Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 
 //find all orders within past day
 Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 //find last order
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-Order.findOne({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 
 Coin.findOne({code: coin1}, function(err, coin_one){
 Coin.findOne({code: coin2}, function(err, coin_two){
@@ -736,7 +736,7 @@ console.log('pending bids ' + pending_bids);
 
 console.log(coin1);
 console.log(coin2);
-OrderData.find({$and: [{coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
+OrderData.find({$and: [{swap: false}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
 
@@ -1387,7 +1387,8 @@ Coin.aggregate(
                             coin_ticker_one: val.code,
                             coin_ticker_two: 'btc',
                             price: bid_price,
-                            quantity: bid_quantity
+                            quantity: bid_quantity,
+                            swap: false
         });
 
         order_data.save(function(err){
@@ -5820,11 +5821,11 @@ $.each(result, function(key,val){
 (function(key,val){
 Order.findOne({$and: [{coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
 Order.findOne({$and: [{coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
-OrderData.findOne({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-OrderData.findOne({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-OrderData.findOne({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 Order.find({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
 var bid_price;
@@ -5996,11 +5997,11 @@ console.log('fucking price ' + valc);
 (function(keyc,valc,keyd,vald){    
 Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
 Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
-OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-OrderData.findOne({$and:[{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+OrderData.findOne({$and:[{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 //Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
 orders_within_day = [];
