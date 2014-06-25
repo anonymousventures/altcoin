@@ -5671,8 +5671,8 @@ console.log(activated);
 console.log(user);
 
 OrderData.find({}).sort('-time').limit(5).exec(function(err, orderdata){
-Order.find({$and: [{pending: 'pending'}, {side: 'bid'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, bids){
-Order.find({$and: [{pending: 'pending'}, {side: 'ask'}, {swap: false}]}).sort('-time').limit(5).exec(function(err, asks){
+Order.find({$and: [{pending: 'pending'}, {side: 'bid'}, {swap: true}]}).sort('-time').limit(5).exec(function(err, bids){
+Order.find({$and: [{pending: 'pending'}, {side: 'ask'}, {swap: true}]}).sort('-time').limit(5).exec(function(err, asks){
 
 console.log(orderdata);
 

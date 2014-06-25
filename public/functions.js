@@ -377,7 +377,7 @@ $.each(option_types, function(key,val){
 
 selection_string = '<span style="text-align: left; margin-left: 0px !important">Select coin:</span>\
  <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
-   <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
+   <span style="text-align: left; margin-left: 0px !important">Select by option type:</span>\
  <br> <select class="form-control select_option" style="width:300px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
  <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
