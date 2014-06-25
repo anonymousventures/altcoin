@@ -11,12 +11,19 @@
 
 <link rel="stylesheet" href="./magnific/dist/magnific-popup.css"> 
 <link rel="stylesheet" href="../../style3.css"> 
+
+    <link rel="stylesheet" href="../../amcharts/style.css" type="text/css">
+
+    <script src="../../amcharts/amcharts.js" type="text/javascript"></script>
+    <script src="../../amcharts/serial.js" type="text/javascript"></script>
+    <script src="../../amcharts/amstock.js" type="text/javascript"></script>
+ 
 <!-- jQuery 1.7.2+ or Zepto.js 1.0+ -->
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
 <!-- Magnific Popup core JS file -->
-<script src="../magnific/dist/jquery.magnific-popup.js"></script> 
+<script src="magnific/dist/jquery.magnific-popup.js"></script> 
 <!-- Add jQuery library -->
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 
@@ -37,30 +44,37 @@
 
 <link rel="stylesheet" href="../../css/bootstrap.css">
 
+
 <!-- Optional theme -->
 <!--
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 -->
 <!-- Latest compiled and minified JavaScript -->
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../js/noty/packaged/jquery.noty.packaged.min.js"></script>
 
 
 <script src="/socket.io/socket.io.js"></script>
-
+<script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js" type="text/javascript"></script>
 <script>
 $( document ).ready(function() {
-coin_info = {{{coin_info}}};
-//alert(JSON.stringify(coin_info));
+activated ={{{activated}}};
+user = {{{user}}};
+
+
 
 });
 
 </script>
 
+<script src="../../functions.js"></script>
 <script src="../../global.js"></script>
 
 
 <script>
 
+//alert(last_bitstamp);
+//$('#current_btc_price').html('$' + last_bitstamp);
 
 //alert('hi');
 
@@ -69,6 +83,7 @@ coin_info = {{{coin_info}}};
 
 </head>
 <body>
+  <div id="live"></div>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -79,7 +94,7 @@ coin_info = {{{coin_info}}};
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#" id="brandname"> BrandName</a>
+      <a class="navbar-brand" href="../../" id="brandname"> GenesisBlock</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -88,25 +103,29 @@ coin_info = {{{coin_info}}};
         <!--
         <li class="active" style="margin-left: 30px"><a href="#">Link</a></li>
         -->
-        <li><a href="#">Trading</a></li>
-        <li><a href="#">Voting</a></li>
-        <li><a href="#">Fees</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Support</a></li>
+        <li><a href="../../coin_trading">Coin Trading</a></li>
+        <li><a href="../../options">Options</a></li>
+        <li><a href="../../fees">Fees</a></li>
+        <li><a href="../../about">About</a></li>
+        <li><a href="../../support">Support</a></li>
+        <li><a href="../../faq">FAQ</a></li>
         
       </ul>
 
-      <ul class="nav navbar-nav navbar-right">
+      <ul id="right_bar" class="nav navbar-nav navbar-right">
+        <li><a href="../../register" id="register">Register</a></li>
+        <li><a href="../../login" id="login">Login</a></li>
 
 
+<!--
           <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
 
       
           <ul class="dropdown-menu">
-            <li><a href="#">Profile</a></li>
+            <li><a href="profile">Profile</a></li>
             <li><a href="balances">Balances</a></li>
-            <li><a href="#">Deposits</a></li>
+            <li><a href="deposits">Deposits</a></li>
             <li><a href="#">Withdrawals</a></li>
             <li><a href="#">Orders</a></li>
             <li><a href="#">Trade History</a></li>
@@ -115,31 +134,48 @@ coin_info = {{{coin_info}}};
           </ul>
     
         </li>  
-
+-->
 
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+<div id="yolo"></div>
+<div id="outter_content">
 
-<div id="balances">
 
+
+
+<div class="inner_content">
 <div id="withdraw_success">
 Withdrawal Successfully Confirmed
 </div>
 
 <div id="withdraw_success_caption">
-Thanks for using CryptoX
+Thanks for using GenesisBlock.io
+</div>
+
+
+
+
 </div>
 
 
 </div>
 
+    <script type="text/javascript">
 
-<div id="user_info">
-  
 
-</div>
 
+
+    </script>
+
+
+<div id="user_info"></div>
+<style type='text/css'>@import url('http://getbarometer.s3.amazonaws.com/assets/barometer/css/barometer.css');</style>
+<script src='http://getbarometer.s3.amazonaws.com/assets/barometer/javascripts/barometer.js' type='text/javascript'></script>
+<script type="text/javascript" charset="utf-8">
+  BAROMETER.load('jxQ78cy2kKzKRThtwzTpq');
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 
 function add_price_handlers(){
       console.log('here ' + coin_two_balance);
-   $('#bid_quantity').on('change', function () {
+   $('#bid_quantity').on('input', function () {
       bid_quantity = $('#bid_quantity').val();
       bid_price = $('#bid_price').val();
 
@@ -25,7 +25,7 @@ function add_price_handlers(){
   }); 
 
 
-    $('#bid_price').on('change', function () {
+    $('#bid_price').on('input', function () {
 
       bid_quantity = $('#bid_quantity').val();
       bid_price = $('#bid_price').val();
@@ -56,7 +56,7 @@ function add_price_handlers(){
 
 
 
-    $('#ask_quantity').on('change', function () {
+    $('#ask_quantity').on('input', function () {
 
       ask_quantity = $('#ask_quantity').val();
       ask_price = $('#ask_price').val();
@@ -82,7 +82,7 @@ function add_price_handlers(){
   }); 
 
 
-    $('#ask_price').on('change', function () {
+    $('#ask_price').on('input', function () {
 
 
 
@@ -137,7 +137,14 @@ function add_order_handlers(){
         dataType: "html"
       }).done(function(data){
 
-        alert(data);
+        btc_balance = parseFloat($('#coin_two_balance').html());
+        btc_balance -= (bid_quantity * bid_price);
+
+        $('#coin_two_balance').html(btc_balance);
+
+        notification = 'Your order has been placed';
+        noty({text: notification});
+        //alert(data);
 
       });
 
@@ -166,7 +173,14 @@ function add_order_handlers(){
         dataType: "html"
       }).done(function(data){
 
-        alert(data);
+
+        coin_one_balance = parseFloat($('#coin_one_balance').html());
+        coin_one_balance -= (ask_quantity * ask_price);
+
+        $('#coin_one_balance').html(coin_one_balance);
+
+        notification = 'Your order has been placed';
+        noty({text: notification});
 
       });
 
@@ -512,7 +526,7 @@ function add_options_price_handlers(){
 
 
       console.log('here ' + coin_two_balance);
-   $('#bid_quantity').on('change', function () {
+   $('#bid_quantity').on('input', function () {
       bid_quantity = $('#bid_quantity').val();
       bid_price = $('#bid_price').val();
 
@@ -536,7 +550,7 @@ function add_options_price_handlers(){
   }); 
 
 
-    $('#bid_price').on('change', function () {
+    $('#bid_price').on('input', function () {
 
       bid_quantity = $('#bid_quantity').val();
       bid_price = $('#bid_price').val();
@@ -567,7 +581,7 @@ function add_options_price_handlers(){
 
 
 
-    $('#ask_quantity').on('change', function () {
+    $('#ask_quantity').on('input', function () {
 
       ask_quantity = parseFloat($('#ask_quantity').val());
       ask_price =  parseFloat($('#ask_price').val());
@@ -591,7 +605,8 @@ function add_options_price_handlers(){
 
       //margin = ask_quantity;
 
-      total =  margin;
+      total =  parseFloat(margin);
+
 
 
       if (total > flagged_balance){
@@ -608,7 +623,7 @@ function add_options_price_handlers(){
   }); 
 
 
-    $('#ask_price').on('change', function () {
+    $('#ask_price').on('input', function () {
 
 
       ask_quantity =  parseFloat($('#ask_quantity').val());
@@ -633,7 +648,7 @@ function add_options_price_handlers(){
 
       //margin = ask_quantity;
 
-      total = margin;
+      total = parseFloat(margin);
 
       if (total > flagged_balance){
             console.log('inside here');
@@ -677,7 +692,16 @@ function add_order_options_handlers(){
         dataType: "html"
       }).done(function(data){
 
-        alert(data);
+
+
+        btc_balance = parseFloat($('#coin_two_balance').html());
+        btc_balance -= (bid_quantity * bid_price);
+
+        $('#coin_two_balance').html(btc_balance);
+
+        notification = 'Your order has been placed';
+        noty({text: notification});
+
 
       });
 
@@ -709,7 +733,31 @@ function add_order_options_handlers(){
         dataType: "html"
       }).done(function(data){
 
-        alert(data);
+        if (kind == 'CALL'){
+        
+        coin_one_balance = parseFloat($('#coin_one_balance').html());
+        coin_one_balance -= (ask_quantity);
+
+        $('#coin_one_balance').html(coin_one_balance.toFixed(6));
+
+        notification = 'Your order has been placed';
+        noty({text: notification});
+
+        }
+        else{
+
+        coin_one_balance = parseFloat($('#coin_one_balance').html());
+        coin_one_balance -= (ask_quantity * strike);
+
+        $('#coin_one_balance').html(coin_one_balance.toFixed(6));
+
+        notification = 'Your order has been placed';
+        noty({text: notification});
+
+
+
+        }
+
 
       });
 

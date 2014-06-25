@@ -412,6 +412,33 @@ io.sockets.on('connection', function (socket) {
 });
 
 
+//sorting functions
+function dynamicSort(property) { 
+    return function (obj1,obj2) {
+        return obj1[property] > obj2[property] ? 1
+            : obj1[property] < obj2[property] ? -1 : 0;
+    }
+}
+
+function dynamicSortMultiple() {
+    /*
+     * save the arguments object as it will be overwritten
+     * note that arguments object is an array-like object
+     * consisting of the names of the properties to sort by
+     */
+    var props = arguments;
+    return function (obj1, obj2) {
+        var i = 0, result = 0, numberOfProperties = props.length;
+        /* try getting a different result from 0 (equal)
+         * as long as we have extra properties to compare
+         */
+        while(result === 0 && i < numberOfProperties) {
+            result = dynamicSort(props[i])(obj1, obj2);
+            i++;
+        }
+        return result;
+    }
+}
 
 
 
@@ -5554,6 +5581,11 @@ console.log(val);
 });
 
 
+
+
+
+
+
 app.get('/balances', csrf,  function(req,res){
 console.log('here');
 if (req.session.activated ){
@@ -5586,6 +5618,23 @@ Order.find({_id: valb._id}).populate({path: 'variation_margin',
                 orders_populated.push(doc);
                 console.log(keyb);
                 if (keyb == data.orders.length -1){
+                    //comparator
+                    function compare(a,b) {
+                      if (a.time > b.time)
+                         return -1;
+                      if (a.time < b.time)
+                        return 1;
+                      return 0;
+                    }
+
+
+
+                    data.deposits.sort(compare);
+                    data.withdrawals.sort(compare);
+                    data.orders.sort(compare);
+
+
+
                     console.log('the ordersa ' + orders_populated);
                     res.render('tab_template.html', {csrf: JSON.stringify(req.session._csrf), data: JSON.stringify(data), orders_populated: JSON.stringify(orders_populated)});
 
@@ -6066,33 +6115,6 @@ array.push(obj);
 if (array.length == coins.length * 4 * 6 * 2){
 
 
-//sorting functions
-function dynamicSort(property) { 
-    return function (obj1,obj2) {
-        return obj1[property] > obj2[property] ? 1
-            : obj1[property] < obj2[property] ? -1 : 0;
-    }
-}
-
-function dynamicSortMultiple() {
-    /*
-     * save the arguments object as it will be overwritten
-     * note that arguments object is an array-like object
-     * consisting of the names of the properties to sort by
-     */
-    var props = arguments;
-    return function (obj1, obj2) {
-        var i = 0, result = 0, numberOfProperties = props.length;
-        /* try getting a different result from 0 (equal)
-         * as long as we have extra properties to compare
-         */
-        while(result === 0 && i < numberOfProperties) {
-            result = dynamicSort(props[i])(obj1, obj2);
-            i++;
-        }
-        return result;
-    }
-}
 
 array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
 
@@ -6863,11 +6885,22 @@ res.end('done');
 app.get('/withdraw/confirm/:hash', function(req,res){
 hash = req.params.hash;
 
+activated = req.session.activated;
+user = req.session.user;
+
+if (activated == undefined){
+    activated = false;
+    user = null;
+}
+
+
+
+
 console.log('the fucki');
 
 Withdrawal.findOneAndUpdate({$and:[{hash: hash}, {pending: true}]}, {$set: {pending: false}}).populate('user coin').exec(function (err, withdrawal) {
 if (withdrawal != null){
-res.render('withdraw_confirm.html');
+res.render('withdraw_confirm.html', {activated: activated, user: JSON.stringify(user)});
 
 Coin.findByIdAndUpdate(withdrawal.coin._id, {$inc:{balance: -1 * (withdrawal.amount + withdrawal.fee), pending_withdrawals: -1 * (withdrawal.amount - withdrawal.fee)}} , function(err, coin){
 
@@ -7121,6 +7154,9 @@ User.findByIdAndUpdate(id,{$push: {deposits: deposit}}, function(err, user){
 
 });
 
+io.sockets.emit('deposit', {deposit: deposit});
+console.log('emit shit');
+
    // console.log(deposit);
 
     coin.deposits.push(deposit);
@@ -7160,8 +7196,12 @@ if (txid == '917cd84b5943035bd39753e62ad4fee0ea2d265f99f97625fbc40f77d4dcb901'){
 Deposit.findOneAndUpdate({$and: [{pending: true}, {txid: txid}]},{$set: {pending: false}} ,function(err, deposit){
 
 
+
 //console.log("status changed" + txid + deposit);
 if (deposit != null){
+
+io.sockets.emit('deposit', {deposit: deposit});
+console.log('emit shit');
 //console.log('ahgod ' + deposit);
 console.log(deposit.amount);
 //console.log('deposit ' + deposit);

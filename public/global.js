@@ -6,7 +6,109 @@ else
   prefix = 'http://genesisblock.io/';
 
 
-if (  document.URL.indexOf('options') != -1 || document.URL.indexOf('altmarket') != -1 ||document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
+//begin noty
+
+
+
+$.noty.defaults = {
+    layout: 'bottomRight',
+    theme: 'defaultTheme',
+    type: 'success',
+    text: '', // can be html or string
+    dismissQueue: true, // If you want to use queue feature set this true
+    template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+    animation: {
+        open: {height: 'toggle'},
+        close: {height: 'toggle'},
+        easing: 'swing',
+        speed: 500 // opening & closing animation speed
+    },
+    timeout: false, // delay for closing event. Set false for sticky notifications
+    force: false, // adds notification to the beginning of queue when set to true
+    modal: false,
+    maxVisible: 5, // you can set max visible notification for dismissQueue true option,
+    killer: false, // for close all notifications before show
+    closeWith: ['click'], // ['click', 'button', 'hover']
+    timeout: 10000,
+    callback: {
+        onShow: function() {},
+        afterShow: function() {},
+        onClose: function() {},
+        afterClose: function() {}
+    },
+    buttons: false // an array of buttons
+};
+
+// deposit = new Object();
+
+// deposit.amount = 3;
+// deposit.coin_name = 'dogecoin';
+// deposit.confirmation = 1;
+
+// var n = noty({text: deposit.amount + ' ' + first_letter_upper(deposit.coin_name) + 's pending deposit! - Awaiting ' + deposit.confirmation + ' confirmations'});
+
+
+//end noty
+
+var socket = io.connect(prefix);
+
+socket.on('deposit', function (data) {
+    
+deposit = data.deposit;
+
+//alert(JSON.stringify(data));
+
+    if (deposit.pending){
+
+      //alert(deposit.pending);
+
+      pending_deposits = $('[coin_name="'+ deposit.coin_name +'"][fund_property="pending_deposits"]').html();
+      //alert('1 ' + pending_deposits);
+      pending_deposits = parseFloat(pending_deposits);
+      console.log('2 ' + pending_deposits);
+      pending_deposits += deposit.amount;
+      console.log('3 ' + pending_deposits);
+      $('[coin_name="'+ deposit.coin_name +'"][fund_property="pending_deposits"]').html(pending_deposits.toFixed(5));
+
+      notification = deposit.amount + ' ' + first_letter_upper(deposit.coin_name) + 's pending deposit! - Awaiting confirmations';
+
+      //alert(string);
+
+
+      var n = noty({text: notification});
+
+    }
+    else{
+
+      pending_deposits = $('[coin_name="'+ deposit.coin_name +'"][fund_property="pending_deposits"]').html();
+      //alert('1 ' + pending_deposits);
+      pending_deposits = parseFloat(pending_deposits);
+      console.log('2 ' + pending_deposits);
+      pending_deposits -= deposit.amount;
+      console.log('3 ' + pending_deposits);
+      $('[coin_name="'+ deposit.coin_name +'"][fund_property="pending_deposits"]').html(pending_deposits.toFixed(5));
+
+
+      previous_balance = parseFloat($('[coin_name="'+ deposit.coin_name +'"][fund_property="balance"]').html());
+      previous_available_balance = parseFloat($('[coin_name="'+ deposit.coin_name +'"][fund_property="available_balance"]').html())
+
+      current_balance = previous_balance + deposit.amount;
+      current_available_balance = previous_available_balance + deposit.amount;
+
+      $('[coin_name="'+ deposit.coin_name +'"][fund_property="balance"]').html(current_balance.toFixed(5));
+      $('[coin_name="'+ deposit.coin_name +'"][fund_property="available_balance"]').html(current_available_balance.toFixed(5));
+
+      notification = deposit.amount + ' ' + first_letter_upper(deposit.coin_name) + 's succesfully deposited!';
+
+      noty({text: notification});
+
+    }
+
+
+});
+
+
+if (  document.URL.indexOf('withdraw/confirm') != -1 || document.URL.indexOf('options') != -1 || document.URL.indexOf('altmarket') != -1 ||document.URL.indexOf('optmarket') != -1 ||  document.URL.indexOf('contract') != -1 ||  document.URL.indexOf('contract') != -1 || document.URL.indexOf('faq') != -1 || document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('trading') != -1 ||  document.URL.indexOf('voting') != -1 || document.URL.indexOf('fees') != -1 || document.URL.indexOf('about') != -1 || document.URL.indexOf('support') != -1 || document.URL == prefix){
 
 
 if (activated){
@@ -31,7 +133,11 @@ $('#right_bar').append(string);
 }
 
 
+//alert(document.URL);
+
 if (document.URL == prefix){ 
+
+
 
 string = '<div class="index_col col-md-6 col-lg-6 col-sm-6 col-xs-6">\
 <div class="index_col_container">\
@@ -125,8 +231,8 @@ string += '</tbody></table></div>\
 
 
 middle_area = '<div class="index_col col-md-3 col-lg-3 col-sm-3 col-xs-3"><img style="height:50px" class="index_icon" src=\"' + prefix + '/img/trade_icon.png' +  '\">\
-  <h3 class=\"desc\">Live Trading </h3>\
-  <h5 class=\"col-md-12 desc\"> Trade in real-time with live updating prices so you never miss the action.</h5>\
+  <h3 class=\"desc\">Fast Trading </h3>\
+  <h5 class=\"col-md-12 desc\"> Trade in real-time with live updating.</h5>\
   </div>\
   <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:80px; margin-top: 12px\" class=\"index_icon\"  src=\"' + prefix + '/img/low_fees.png' +  '\">\
   <h3 class=\"desc\" style=\"margin-top: 10px\">No fees </h3>\
@@ -134,12 +240,14 @@ middle_area = '<div class="index_col col-md-3 col-lg-3 col-sm-3 col-xs-3"><img s
   </div>\
   <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:60px; margin-top: 25px\" class=\"index_icon\" src=\"' + prefix + '/img/lock_icon.png' +  '\">\
   <h3 class=\"desc\">Security </h3>\
-  <h5 class=\"col-md-12 desc\"> GenesisBlock has been built with bitcoin security principles in mind. We utilise cold storage and strict firewalls.</h5>\
+  <h5 class=\"col-md-12 desc\"> GenesisBlock has been built with bitcoin security principles in mind. We also use cold storage.</h5>\
   </div>\
   <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:50px; margin-top:39px\" class=\"index_icon\" src=\"' + prefix + '/img/support_icon.png' +  '\">\
   <h3 class=\"desc\">Great Support</h3>\
-  <h5 class=\"col-md-12 desc\"> Our support team handle customer queries throughout the day, never will you experience a long wait for a reply.</h5>\
+  <h5 class=\"col-md-12 desc\"> We handle support queries throughout the day, get help when you need it.</h5>\
   </div>';
+
+  //alert(middle_area);
 $('#middle_area').append(middle_area);
 $('#bottom_area').append(string);
 
@@ -2076,7 +2184,7 @@ add_cancel_order_handler();
     <div id="col1">\
     <h3>Buy ' + coin_one_ticker_modified + '</h3>\
     <div id="error_message"></div>\
-    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
                 <span class="label_style">Price Per ' + coin_one_ticker_upper + ':</span> <input type="number" id="bid_price" name="price" value="' + pending_asks[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
@@ -2116,7 +2224,7 @@ add_cancel_order_handler();
     <div id="col2">\
     <h3>Sell ' + coin_one_ticker_modified + '</h3>\
             <div id="error_message_sell"></div>\
-    <div class="fail box">Your ' + coin_one_ticker_upper +' balance is <strong><a href="asdf" class="exchange_balance">' + coin_one_balance + '</a></strong>.</div>\
+    <div class="fail box">Your ' + coin_one_ticker_upper +' balance is <strong><a id="coin_one_balance" href="asdf" class="exchange_balance">' + coin_one_balance + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
                 <span class="label_style">Price Per ' + coin_one_ticker_upper + ':</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
@@ -2273,7 +2381,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     <div id="col1">\
     <h3>Buy Option </h3>\
     <div id="error_message"></div>\
-    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
                 <span class="label_style">Price Per option:</span> <input type="number" id="bid_price" name="price" value="' + pending_asks[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
@@ -2314,7 +2422,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     <div id="col2">\
     <h3>Sell Option</h3>\
             <div id="error_message_sell"></div>\
-    <div class="fail box">Your ' + ticker_flagged +' balance is <strong><a href="asdf" class="exchange_balance">' + amount_flagged + '</a></strong>.</div>\
+    <div class="fail box">Your ' + ticker_flagged +' balance is <strong><a href="asdf"  id="coin_one_balance" class="exchange_balance">' + amount_flagged + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
                 <span class="label_style">Price Per option:</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
@@ -2948,13 +3056,13 @@ a_string += '<div class="table-responsive"><table class="table table-bordered">\
           <tr>\
             <td>' + first_letter_upper(val.coin_name) + '</td>\
             <td>' + val.code.toUpperCase() + '</td>\
-            <td>'+ val.balance.toPrecision(6) + '</td>\
+            <td fund_property="balance" coin_name="' + val.coin_name + '">'+ val.balance.toPrecision(6) + '</td>\
             <td>'+ val.in_positions.toPrecision(6)  + '</td>\
             <td>'+ val.in_orders.toPrecision(6)  + '</td>\
             <td>'+ val.in_orders_non_margin.toPrecision(6)  + '</td>\
-            <td>'+ val.available_balance.toPrecision(6)  + '</td>\
-            <td>'+ val.pending_deposits.toPrecision(6)  + '</td>\
-            <td>'+ val.pending_withdrawals.toPrecision(6)  + '</td>\
+            <td fund_property="available_balance"  coin_name="' + val.coin_name + '">'+ val.available_balance.toPrecision(6)  + '</td>\
+            <td fund_property="pending_deposits"  coin_name="' + val.coin_name + '">'+ val.pending_deposits.toPrecision(6)  + '</td>\
+            <td fund_property="pending_withdrawals"  coin_name="' + val.coin_name + '">'+ val.pending_withdrawals.toPrecision(6)  + '</td>\
           </tr>\
         </tbody>\
       </table></div>'
