@@ -2172,6 +2172,7 @@ add_order_handlers();
 if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket') == -1 ){
 
 
+
     coin_one_ticker_upper = coin_one_ticker.toUpperCase();
     coin_two_ticker_upper = coin_two_ticker.toUpperCase();
 
@@ -2190,13 +2191,17 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     coin_one_balance = coin_one_balance.toPrecision(9);
     coin_two_balance = coin_two_balance.toPrecision(9);
 
-    if (kind = 'CALL'){
+    if (kind == 'CALL'){
       right = 'buy';
       inverse_right = 'sell';
+      ticker_flagged = coin_one_ticker_upper;
+      amount_flagged = coin_one_balance;
     }
     else{
       right = 'sell';
       inverse_right = 'buy';
+      ticker_flagged = coin_two_ticker_upper;
+      amount_flagged = coin_two_balance;
     }
 
     min_order = 1;
@@ -2219,6 +2224,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
       obj.quantity_left = 0;
       pending_bids.push(obj);
     }
+
 
 
 
@@ -2308,12 +2314,12 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     <div id="col2">\
     <h3>Sell Option</h3>\
             <div id="error_message_sell"></div>\
-    <div class="fail box">Your ' + coin_two_ticker_upper +' balance is <strong><a href="asdf" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>\
+    <div class="fail box">Your ' + ticker_flagged +' balance is <strong><a href="asdf" class="exchange_balance">' + amount_flagged + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
                 <span class="label_style">Price Per option:</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toPrecision(9) + '" class="required"> ' + coin_two_ticker_upper + '<br>\
                 <span class="label_style">Total:</span> <span class="total" id="sell_total">' + pending_bids[0].price.toPrecision(9) + '</span> <br>\
-                <span class="label_style">Margin Requirement:</span> <span class="margin_requirement" id="margin_requirement">0.00000000</span> <br>\
+                <span class="label_style">Margin Requirement:</span> <span class="margin_requirement" id="margin_requirement">0.00000000</span>  ' + ticker_flagged + '<br>\
                 <span class="label_style">Trading Fee:</span> <span class="fee" id="buy_fee">0.00000000</span> BTC (' + (10 * order_fee).toPrecision(2) +  '%)<br>\
                 <span class="label_style">Net Total:</span> <span class="netTotalSell" >' + pending_bids[0].price.toPrecision(9) + '</span> ' + coin_two_ticker_upper + 
                 '           <input type="hidden" name="buyNetTotal" id="buy_net_total" value="' + pending_bids[0].price.toPrecision(9) + '" class="required">\

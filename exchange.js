@@ -873,16 +873,16 @@ one_day_ago = current_time - (60 * 60 * 24);
 
 
 
-Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
-Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
 //find all orders within past day
-Order.find({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 //find last order
-Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
-Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
-Order.findOne({$and:[{strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
 
 Coin.findOne({code: coin1}, function(err, coin_one){
 Coin.findOne({code: coin2}, function(err, coin_two){
@@ -935,7 +935,7 @@ console.log('pending bids ' + pending_bids);
 
 console.log(coin1);
 console.log(coin2);
-OrderData.find({$and: [{coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
+OrderData.find({$and: [{call_put: kind}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
 
@@ -1028,7 +1028,7 @@ if (high_price == null)
 
 
 
-res.render('trade_options.html', {activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+res.render('trade_options.html', {kind: JSON.stringify(kind), activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
 
 });
 
@@ -2119,6 +2119,7 @@ call_put = req.body.call_put;
 
 
 console.log('dastrike ' + strike);
+console.log(call_put);
 
 //console.log('coinone' + coin_one_name);
 
@@ -2245,8 +2246,9 @@ ask_quantity_left = val.quantity_left;
 if (!complete ){
     if (ask_quantity_left >= bid_quantity_left){
         quantity_left = ask_quantity_left - bid_quantity_left;
-        //update sell order
 
+
+        //update order on poosing side
         if (ask_quantity_left == bid_quantity_left)
             Order.findByIdAndUpdate(ask_order_id, {$set: {quantity_left: quantity_left, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
 
@@ -2265,8 +2267,6 @@ if (!complete ){
         //update buyer balance
         purchase_cost = bid_quantity_left * val.price;
 
-        console.log('buy quantity left ' + key + ' ' + bid_quantity_left);
-        console.log('purchase cost ' + key + ' ' + ask_value);
 
         //user[coin_one_name].update({$inc: {available_balance: bid_quantity_left, balance: bid_quantity_left}}, { w: 1 }, callback);
         user[coin_two_name].update({$inc: { available_balance: -1 * purchase_cost, balance: -1 * purchase_cost}}, { w: 1 }, callback);
@@ -2370,7 +2370,7 @@ if (!complete ){
 
 
 
-
+        //update seller info
         //console.log('sell order user ' + sell_order);
         User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, seller){
             //console.log('dasell ' + seller);
@@ -2404,6 +2404,7 @@ if (!complete ){
         //update sell order
         bid_quantity_left -= ask_quantity_left;
 
+        //update ask order
         Order.findByIdAndUpdate(ask_order_id, {$set: {quantity_left: 0, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
 
             console.log('fucking error ' + err);
@@ -2420,6 +2421,7 @@ if (!complete ){
         console.log('sell quantity left ' + key + ' ' + ask_quantity_left);
         console.log('sell value ' + key + ' ' + ask_value);
         console.log('bid quantity left ' + key + ' ' + bid_quantity_left);
+
         //update buyer balance
         //user[coin_one_name].update({$inc: {available_balance: ask_quantity_left, balance: ask_quantity_left}}, { w: 1 }, callback);
         user[coin_two_name].update({$inc: { available_balance: -1 * ask_value, balance: -1 * ask_value}}, { w: 1 }, callback);
@@ -2449,6 +2451,7 @@ if (!complete ){
             function callback(err){ console.log('errorhi ' + err)}
             console.log('ovahere ' + user[coin_two_name]);
 
+            //update buyer's balance page info
             user[coin_two_name].update({$inc: {in_orders: bid_quantity_left * bid_price, available_balance: -1 * bid_quantity_left * bid_price, balance: -1 * bid_quantity_left * bid_price}}, { w: 1 }, callback);
 
             order = new Order({
@@ -2586,24 +2589,24 @@ if (!complete ){
 
 });
 
-Order.find({}, function(err, orders){
+// Order.find({}, function(err, orders){
 
-$.each(orders, function(key, val){
+// $.each(orders, function(key, val){
 
-//console.log('yolo here ' + val);
+// //console.log('yolo here ' + val);
 
-if (val.time == 1403335309229){
+// if (val.time == 1403335309229){
 
-//val.update({$set: {quantity: 1}}, function(err, val){});
-
-
-}
+// //val.update({$set: {quantity: 1}}, function(err, val){});
 
 
+// }
 
-});
 
-});
+
+// });
+
+// });
 
 
 app.post('/sell_option', csrf, function(req,res){
