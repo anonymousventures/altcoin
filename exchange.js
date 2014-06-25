@@ -319,7 +319,7 @@ var OrderData = new mongoose.Schema({
     short_symbol: String,
     coin_ticker_one: String,
     coin_ticker_two: String,
-    put_call: String,
+    call_put: String,
     strike: Number,
     expiration: Number,
     price: Number,
@@ -1246,10 +1246,13 @@ console.log("processed");
 
 
 
-app.get('/generate_data', function(req,res){
+app.get('/generate_options_data', function(req,res){
 
 
-for (var i=0; i<7800; i++){
+expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+option_types = new Array("CALL", "PUT");
+
+
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
@@ -1257,27 +1260,150 @@ function getRandomArbitrary(min, max) {
 current_time = new Date().getTime();
 low_limit = current_time - (60000 * 60 * 24 * 60);
 
-random = getRandomArbitrary(low_limit, current_time);
 
-bid_quantity = getRandomArbitrary(1,15);
-bid_price = getRandomArbitrary(.05, .25);
 
+Coin.find().distinct('coin_name', function(err, coins) {
+
+coins.splice( $.inArray('bitcoin', coins), 1 );
+console.log(coins);
+
+Coin.aggregate( 
+       {$match   : {coin_name: {$in: coins }}}, 
+       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+  ).exec(function(err, result){
+
+    $.each(result, function(key,val){
+
+        //start price stuff
+
+        if (val.code == 'ltc')
+        current_price = .016;
+        if (val.code == 'doge')
+        current_price = 0.0000005;
+
+        price_deviation = current_price/10;
+        starting = current_price - 3 * price_deviation;
+
+        prices = new Array();
+
+        for (var i=0; i < 6; i++){
+            
+            price = starting + i * price_deviation;
+            prices.push(price);
+
+        }
+
+
+
+        //end price stuff
+        $.each(prices, function(keyb, valb){
+        $.each(expiration_times, function(keyc, valc){
+        $.each(option_types, function(keyd, vald){
+
+        (function(keyb, valb, keyc,valc,keyd,vald){    
+
+
+
+        for (var i=0; i<3; i++){
+
+        random = getRandomArbitrary(low_limit, current_time);
+        bid_quantity = getRandomArbitrary(1,15);
+        bid_price = getRandomArbitrary(.05, .25);
 
         order_data = new OrderData({
                             time: random,
-                            short_symbol: 'BUSD' + (i%78 + 1),
+                            coin_ticker_one: val.code,
+                            coin_ticker_two: 'btc',
                             price: bid_price,
                             quantity: bid_quantity,
-                            initial_margin: .3,
+                            swap: false,
+                            strike: valb,
+                            expiration: valc, 
+                            call_put: vald 
+
         });
 
         order_data.save(function(err){
             console.log('saveed');
 
         });
-    }
 
-   // });
+
+
+        }
+        })(keyb, valb, keyc, valc, keyd, vald);
+
+    });
+
+    });
+
+});
+
+});
+
+});
+});
+
+
+});
+
+
+
+app.get('/generate_swap_data', function(req,res){
+
+
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+current_time = new Date().getTime();
+low_limit = current_time - (60000 * 60 * 24 * 60);
+
+
+
+Coin.find().distinct('coin_name', function(err, coins) {
+
+coins.splice( $.inArray('bitcoin', coins), 1 );
+console.log(coins);
+
+Coin.aggregate( 
+       {$match   : {coin_name: {$in: coins }}}, 
+       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+  ).exec(function(err, result){
+
+    $.each(result, function(key,val){
+
+        for (var i=0; i<3; i++){
+
+        random = getRandomArbitrary(low_limit, current_time);
+        bid_quantity = getRandomArbitrary(1,15);
+        bid_price = getRandomArbitrary(.05, .25);
+
+        order_data = new OrderData({
+                            time: random,
+                            coin_ticker_one: val.code,
+                            coin_ticker_two: 'btc',
+                            price: bid_price,
+                            quantity: bid_quantity
+        });
+
+        order_data.save(function(err){
+            console.log('saveed');
+
+        });
+
+        }
+
+    });
+
+});
+
+});
+
+
 
 });
 
