@@ -1054,9 +1054,11 @@ else res.redirect('/login');
 
 });
 
+//testing shits
+// OrderData.find({$and: [{strike: 0.019200000}, {expiration: 1404950400000}, {call_put: 'CALL'}, {coin_ticker_one: 'ltc'}, {coin_ticker_two: 'btc'}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
 
-
-
+// console.log(order_data);
+// });
 
 
 app.get('/optmarket/:coin1/:coin2/:kind/:strike/:expiration', csrf, function(req,res){
@@ -1143,7 +1145,7 @@ console.log('pending bids ' + pending_bids);
 
 console.log(coin1);
 console.log(coin2);
-OrderData.find({$and: [{call_put: kind}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
+OrderData.find({$and: [{strike: strike}, {expiration: expiration}, {call_put: kind}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
 
@@ -1541,7 +1543,7 @@ Coin.aggregate(
                             price: bid_price,
                             quantity: bid_quantity,
                             swap: false,
-                            strike: valb,
+                            strike: valb.toFixed(9),
                             expiration: valc, 
                             call_put: vald 
 
