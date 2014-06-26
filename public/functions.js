@@ -390,11 +390,11 @@ $.each(option_types, function(key,val){
 
 
 selection_string = '<span style="text-align: left; margin-left: 0px !important">Select coin:</span>\
- <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+ <br> <select class="form-control select_coin" style="width:250px" >' + coin_selection + '</select><br>\
    <span style="text-align: left; margin-left: 0px !important">Select by option type:</span>\
- <br> <select class="form-control select_option" style="width:300px" >' + option_selection + '</select><br>\
+ <br> <select class="form-control select_option" style="width:250px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
- <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
+ <br> <select class="form-control select_expiration" style="width:250px" >' + expiration_selection + '</select><br>';
 
 
 string = '';
@@ -411,6 +411,21 @@ string = '';
 $.each(coin_data, function(key,val){
 
 
+if (val.bid != 'n/a')
+bid = parseFloat(val.bid).toFixed(5);
+else
+bid = val.bid;
+
+if (val.ask != 'n/a')
+ask = parseFloat(val.ask).toFixed(5);
+else
+ask = val.ask;
+
+volume  = parseFloat(val.volume).toFixed(5);
+low  = parseFloat(val.low).toFixed(5);
+high  = parseFloat(val.high).toFixed(5);
+
+
 href_ticker = val.coin_one_ticker + '/btc/' + val.call_put + '/' + val.strike.toFixed(9) + '/' + val.expiration;
 href_title = val.coin_one_ticker.toUpperCase() + '/BTC/' + val.call_put + '/<br>' + val.strike.toFixed(9) + '/<br>' + val.expiration;
 if (flag)
@@ -424,7 +439,7 @@ if (key%6 == 0){
 console.log('in here' + key);
 
 
-table_header = '<table class="table table-bordered"  style="margin-bottom:50px">\
+table_header = '<div class="table-responsive"><table class="table table-bordered"  style="margin-bottom:50px">\
         <thead key="' + key + '" call_put_anchor="' + val.call_put + '" coin_name_anchor="' + val.coin_one_name  +'" expiration_time_anchor="' + val.expiration +'">\
           <tr>\
             <th>Market</th>\
@@ -440,23 +455,23 @@ table_header = '<table class="table table-bordered"  style="margin-bottom:50px">
         </thead><tbody>';
 
 selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
- <br> <select class="form-control select_coin" style="width:300px" >' + coin_selection + '</select><br>\
+ <br> <select class="form-control select_coin" style="width:250px" >' + coin_selection + '</select><br>\
     <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
- <br> <select class="form-control select_option" style="width:300px" >' + option_selection + '</select><br>\
+ <br> <select class="form-control select_option" style="width:250px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
- <br> <select class="form-control select_expiration" style="width:300px" >' + expiration_selection + '</select><br>';
+ <br> <select class="form-control select_expiration" style="width:250px" >' + expiration_selection + '</select><br>';
 
 substring = selection_string;
 substring += table_header;
 
 substring +='<tr id="tab_row" style="margin-bottom: 30px">\
         <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
-        <td class="tab_td_order">' + val.last + '</td>\
-        <td class="tab_td_order">' + val.bid + '</td>\
-        <td class="tab_td_order">' + val.ask + '</td>\
-        <td class="tab_td_order">' + val.volume + '</td>\
-        <td class="tab_td_order">' + val.low + '</td>\
-        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.last.toFixed(5) + '</td>\
+        <td class="tab_td_order">' + bid + '</td>\
+        <td class="tab_td_order">' + ask + '</td>\
+        <td class="tab_td_order">' + volume + '</td>\
+        <td class="tab_td_order">' + low + '</td>\
+        <td class="tab_td_order">' + high + '</td>\
         <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
         <td class="tab_td_order">' + format_time(val.expiration)  + '</td>\
 </tr>';
@@ -471,25 +486,25 @@ console.log(substring);
 else if (key%6 == 5)
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
         <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
-        <td class="tab_td_order">' + val.last + '</td>\
-        <td class="tab_td_order">' + val.bid + '</td>\
-        <td class="tab_td_order">' + val.ask + '</td>\
-        <td class="tab_td_order">' + val.volume + '</td>\
-        <td class="tab_td_order">' + val.low + '</td>\
-        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.last.toFixed(5) + '</td>\
+        <td class="tab_td_order">' + bid + '</td>\
+        <td class="tab_td_order">' + ask + '</td>\
+        <td class="tab_td_order">' + volume + '</td>\
+        <td class="tab_td_order">' + low + '</td>\
+        <td class="tab_td_order">' + high + '</td>\
         <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
         <td class="tab_td_order">' + format_time(val.expiration)  + '</td>\
-</tr></tbody></table>';
+</tr></tbody></table></div>';
 
 else  
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
         <td class="tab_td_order"><a class="' + flag_result + '" ticker="' + href_ticker + '">' + href_title + '</td>\
-        <td class="tab_td_order">' + val.last + '</td>\
-        <td class="tab_td_order">' + val.bid + '</td>\
-        <td class="tab_td_order">' + val.ask + '</td>\
-        <td class="tab_td_order">' + val.volume + '</td>\
-        <td class="tab_td_order">' + val.low + '</td>\
-        <td class="tab_td_order">' + val.high + '</td>\
+        <td class="tab_td_order">' + val.last.toFixed(5) + '</td>\
+        <td class="tab_td_order">' + bid + '</td>\
+        <td class="tab_td_order">' + ask + '</td>\
+        <td class="tab_td_order">' + volume + '</td>\
+        <td class="tab_td_order">' + low + '</td>\
+        <td class="tab_td_order">' + high + '</td>\
         <td class="tab_td_order">' + val.strike.toFixed(9) + '</td>\
         <td class="tab_td_order">' + format_time(val.expiration) + '</td>\
 </tr>';
