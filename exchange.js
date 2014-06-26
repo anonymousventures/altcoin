@@ -6446,10 +6446,12 @@ array = new Array();
 option_types = new Array("CALL", "PUT");
 
 
-Coin.find().distinct('coin_name', function(err, coins) {
+//Coin.find().distinct('coin_name', function(err, coins) {
 
-coins.splice( $.inArray('bitcoin', coins), 1 );
-coins.splice( $.inArray('litecoin', coins), 1 );
+//coins.splice( $.inArray('bitcoin', coins), 1 );
+//coins.splice( $.inArray('litecoin', coins), 1 );
+coins = new Array("litecoin");
+
 console.log(coins);
 
 Coin.aggregate( 
@@ -6644,7 +6646,7 @@ res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringi
 
 
 
-});
+//});
 
 
 });
