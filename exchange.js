@@ -5436,7 +5436,7 @@ x11coin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 4,
     withdraw_fee: .0002,
     order_fee: .015
 });
@@ -5467,7 +5467,7 @@ darkcoin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 5,
     withdraw_fee: .0002,
     order_fee: .015
 });
@@ -5497,7 +5497,7 @@ ppcoin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 6,
     withdraw_fee: .0002,
     order_fee: .015
 });
@@ -5525,7 +5525,7 @@ vericoin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 7,
     withdraw_fee: .0002,
     order_fee: .015
 });
@@ -5555,7 +5555,7 @@ blackcoin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 8,
     withdraw_fee: .0002,
     order_fee: .015
 });
@@ -5583,7 +5583,7 @@ namecoin = new Coin({
     user: user,
     deposit_address: address,
     confirmation: 1,
-    coin_number: 1,
+    coin_number: 9,
     withdraw_fee: .0002,
     order_fee: .015
 });
