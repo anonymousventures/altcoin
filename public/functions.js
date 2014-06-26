@@ -1,3 +1,6 @@
+//$( document ).ready(function() {
+
+
 
 function add_price_handlers(){
       console.log('here ' + coin_two_balance);
@@ -12,6 +15,7 @@ function add_price_handlers(){
 
       total = bid_quantity * bid_price;
 
+      if (activated)
       if (total > coin_two_balance){
             console.log('inside here');
       if ($('#error_message').html().length < 3)
@@ -37,6 +41,7 @@ function add_price_handlers(){
 
       total = bid_quantity * bid_price;
 
+      if (activated)
       if (total > coin_two_balance){
             console.log('inside here');
       if ($('#error_message').html().length < 3)
@@ -55,7 +60,6 @@ function add_price_handlers(){
 
 
 
-
     $('#ask_quantity').on('input', function () {
 
       ask_quantity = $('#ask_quantity').val();
@@ -68,6 +72,7 @@ function add_price_handlers(){
 
       total = ask_quantity * ask_price;
 
+      if (activated)
       if (total > coin_one_balance){
             console.log('inside here');
       if ($('#error_message_sell').html().length < 3)
@@ -96,6 +101,7 @@ function add_price_handlers(){
 
       total = ask_quantity * ask_price;
 
+      if (activated)
       if (total > coin_one_balance){
             console.log('inside here');
       if ($('#error_message_sell').html().length < 3)
@@ -117,6 +123,10 @@ function add_price_handlers(){
 function add_order_handlers(){
 
     $('#buy_order').click(function(){
+
+      if (!activated)
+        alert('Please login to submit orders');
+      else{
       bid_quantity = $('#bid_quantity').val();
       bid_price = $('#bid_price').val();
       coin_ticker_one = coin_one_ticker;
@@ -147,6 +157,7 @@ function add_order_handlers(){
         //alert(data);
 
       });
+    }
 
     });
 
@@ -161,8 +172,10 @@ function add_order_handlers(){
       coin_name_one = coin_one_name;
       coin_name_two = coin_two_name;
       //alert(buy_amount);
+      if (!activated)
+      alert('Please login to submit orders');
 
-
+      else{
       if (ask_quantity * ask_price <= 0)
             alert('Total must be greater than or equal to zero!');
       else
@@ -183,6 +196,7 @@ function add_order_handlers(){
         noty({text: notification});
 
       });
+    }
 
     });
 
@@ -565,6 +579,8 @@ function add_options_price_handlers(){
 
       total = bid_quantity * bid_price;
 
+
+      if (activated)
       if (total > coin_two_balance){
             console.log('inside here');
       if ($('#error_message').html().length < 3)
@@ -574,6 +590,8 @@ function add_options_price_handlers(){
          if ($('#error_message').html().substr(0,3) == 'Net')
             $('#error_message').empty();
       }
+
+
 
   }); 
 
@@ -590,6 +608,7 @@ function add_options_price_handlers(){
 
       total = bid_quantity * bid_price;
 
+      if (activated)
       if (total > coin_two_balance){
             console.log('inside here');
       if ($('#error_message').html().length < 3)
@@ -636,7 +655,7 @@ function add_options_price_handlers(){
       total =  parseFloat(margin);
 
 
-
+      if (activated)
       if (total > flagged_balance){
             console.log('inside here');
       if ($('#error_message_sell').html().length < 3)
@@ -658,6 +677,8 @@ function add_options_price_handlers(){
       ask_price =  parseFloat($('#ask_price').val());
       var flagged_balance;
 
+
+      
       if (kind == 'CALL'){
         margin = (ask_quantity * 1).toFixed(9);
         flagged_balance = coin_one_balance;
@@ -678,6 +699,7 @@ function add_options_price_handlers(){
 
       total = parseFloat(margin);
 
+      if (activated)
       if (total > flagged_balance){
             console.log('inside here');
       if ($('#error_message_sell').html().length < 3)
@@ -687,6 +709,9 @@ function add_options_price_handlers(){
          if ($('#error_message_sell').html().substr(0,3) == 'Mar')
             $('#error_message_sell').empty();
       }
+
+
+
 
   }); 
 
@@ -710,6 +735,10 @@ function add_order_options_handlers(){
 
       //alert(coin_ticker_one);
 
+      if (!activated)
+      alert('Please login to make orders')
+
+      else
       if (bid_quantity * bid_price <= 0)
             alert('Total must be greater than 0!');
       else
@@ -750,7 +779,11 @@ function add_order_options_handlers(){
       margin = ask_quantity;
       //alert(buy_amount);
 
+      if (!activated)
+      alert('Please login to make orders')
 
+
+      else
       if (ask_quantity * ask_price <= 0)
             alert('Total must be greater than or equal to zero!');
       else
@@ -913,4 +946,4 @@ function add_options_table_handlers(){
 
 
 
-
+//});
