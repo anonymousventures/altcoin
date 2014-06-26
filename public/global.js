@@ -8,6 +8,18 @@ else
 
 //begin noty
 
+//adjust navbar for mobile
+
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+ // some code..
+$('.navbar-fixed-top').attr('class', 'navbar navbar-default navbar-static-top');
+$('#top_area').css('margin-top', '0px');
+$('.navbar-static-top').css('margin-bottom', '0px');
+
+}
+
+
+
 
 
 $.noty.defaults = {
