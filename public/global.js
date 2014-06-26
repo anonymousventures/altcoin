@@ -284,45 +284,45 @@ add_options_table_handlers();
          window.open(prefix + 'optmarket/' + ticker ,'_blank');
      });
 
-// $.ajax({
-//   url: "/append_options",
-//   type: "POST",
-//   data: '',
-//   dataType: "html"
-// }).done(function(data){
+$.ajax({
+  url: "/append_options",
+  type: "POST",
+  data: '',
+  dataType: "html"
+}).done(function(data){
 
 
-// console.log(JSON.stringify(data));
+console.log(JSON.stringify(data));
 
-// //alert(data.coins);
-// data = $.parseJSON(data);
-// console.log(JSON.stringify(data));
-// console.log(data.coins);
-
-
-// activated = data.activated;
-// user = data.user;
-// coin_data = data.coin_data;
-// coins = data.coins;
+//alert(data.coins);
+data = $.parseJSON(data);
+console.log(JSON.stringify(data));
+console.log(data.coins);
 
 
-// //alert(coin_data);
-
-// string2 = generate_options_table(true);
-// $('#trading_table').append(string2);
-
-// add_options_table_handlers();
+activated = data.activated;
+user = data.user;
+coin_data = data.coin_data;
+coins = data.coins;
 
 
-//      $("a.options_page_href2").on("click",function(){
-//          ticker = $(this).attr("ticker");
-//          window.open(prefix + 'optmarket/' + ticker ,'_blank');
-//      });
+//alert(coin_data);
 
-// //alert(data);
+string2 = generate_options_table(true);
+$('#trading_table').append(string2);
+
+add_options_table_handlers();
 
 
-// });
+     $("a.options_page_href2").on("click",function(){
+         ticker = $(this).attr("ticker");
+         window.open(prefix + 'optmarket/' + ticker ,'_blank');
+     });
+
+//alert(data);
+
+
+});
 
 
 
