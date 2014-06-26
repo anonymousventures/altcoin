@@ -7051,7 +7051,7 @@ array = new Array();
 Coin.find().distinct('coin_name', function(err, coins) {
 
 coins.splice( $.inArray('bitcoin', coins), 1 );
-coins.splice( $.inArray('dogecoin', coins), 1 );
+coins.splice( $.inArray('litecoin', coins), 1 );
 console.log(coins);
 
 Coin.aggregate( 
@@ -7076,6 +7076,20 @@ if (val.code == 'ltc')
 current_price = .016;
 if (val.code == 'doge')
 current_price = 0.0000005;
+
+if (val.code == 'x11')
+current_price = 1;
+if (val.code == 'drk')
+current_price = 1;
+if (val.code == 'ppc')
+current_price = 1;
+if (val.code == 'vrc')
+current_price = 1;
+if (val.code == 'blk')
+current_price = 1;
+if (val.code == 'nmc')
+current_price = 1;
+
 
 price_deviation = current_price/10;
 starting = current_price - 3 * price_deviation;
