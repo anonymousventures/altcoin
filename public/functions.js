@@ -274,7 +274,7 @@ $.each(coin_data, function(key,val){
 
 
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="tab_td_order"><a class="contract_page_href" ticker="' + val.coin_one_ticker + '">' + val.coin_one_ticker + '/' + val.coin_two_ticker + '</td>\
+        <td class="tab_td_order"><a class="contract_page_href" ticker="' + val.coin_one_ticker + '">' + val.coin_one_ticker.toUpperCase()  + '/' + val.coin_two_ticker.toUpperCase()  + '</td>\
         <td class="tab_td_order">' + val.last + '</td>\
         <td class="tab_td_order">' + val.bid + '</td>\
         <td class="tab_td_order">' + val.ask + '</td>\
