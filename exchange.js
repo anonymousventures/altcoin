@@ -4,7 +4,7 @@ var jsdom = require("jsdom");
  var crypto = require('crypto');
  var fs = require('fs');
  var binary = require('binary');
-
+var ip = require("ip");
  var mongoose = require('mongoose');
 
 bitcoin = require('bitcoin');
@@ -122,6 +122,8 @@ var ContractRef = new mongoose.Schema({
 });
 
 
+
+if ( ip.address() == '192.168.1.56')
 var User = new mongoose.Schema({
     email: String,
     password: String,
@@ -226,6 +228,124 @@ BUSD77: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
 BUSD78: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
 BUSD79: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
 });
+else
+var User = new mongoose.Schema({
+    email: String,
+    password: String,
+    full_name: String,
+    hash: String,
+    activated: { type: Boolean, default: false},
+    deposits: [{ type: mongoose.Schema.ObjectId, ref: 'Deposit' }],
+    dogecoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    bitcoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    litecoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+
+    x11coin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    darkcoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    ppcoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    vericoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    blackcoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+    namecoin: { type: mongoose.Schema.ObjectId, ref: 'Coin' },
+
+    withdrawals: [{ type: mongoose.Schema.ObjectId, ref: 'Withdrawal' }],
+    orders: [{ type: mongoose.Schema.ObjectId, ref: 'Order' }],
+    deposit_address: String,
+    balance: { type: Number, default: 0},
+    available_balance: { type: Number, default: 0},
+    pending_deposits: { type: Number, default: 0},
+    pending_withdrawals: { type: Number, default: 0},
+    current_margin: { type: Number, default: 0},
+    maintenance_margin: { type: Number, default: 0},
+    required_margin:  { type: Number, default: 0},
+    in_positions: { type: Number, default: 0},
+    in_orders: { type: Number, default: 0},
+    in_orders_non_margin: { type: Number, default: 0},
+    login_attempts: [Number],
+    BUSD1: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD2: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD3: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD4: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD5: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD6: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD7: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD8: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD9: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD10: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD11: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD12: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD13: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD14: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD15: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD16: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD17: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD18: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD19: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD20: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD21: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD22: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD23: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD24: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD25: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD26: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD27: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD28: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD29: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD30: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD31: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD32: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD33: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD34: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD35: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD36: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD37: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD38: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD39: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD40: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD41: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD42: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD43: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD44: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD45: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD46: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD47: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD48: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD49: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD50: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD51: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD52: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD53: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD54: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD55: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD56: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD57: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD58: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD59: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD60: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD61: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD62: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD63: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD64: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD65: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD66: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD67: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD68: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD69: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD70: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD71: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD72: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD73: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD74: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD75: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD76: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD77: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD78: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+BUSD79: { type: mongoose.Schema.ObjectId, ref: 'Contract' },
+});
+
+
+
+
+
 
 
 for (i=0; i<80; i++){
@@ -268,6 +388,8 @@ var VariationMargin = new mongoose.Schema({
     order:  { type: mongoose.Schema.ObjectId, ref: 'Order' },
     amount: Number
 });
+
+
 
 var Order = new mongoose.Schema({
     swap: Boolean,
@@ -386,13 +508,72 @@ var dogecoin_client = new bitcoin.Client({
 });
 
 
+if ( ip.address() != '192.168.1.56'){
+
+var x11coin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12351,
+  user: 'x11coinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+var darkcoin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12345,
+  user: 'darkcoinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+var ppcoin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12347,
+  user: 'ppcoinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+var vericoin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12348,
+  user: 'vericoinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+
+var blackcoin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12349,
+  user: 'blackcoinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+var namecoin_client = new bitcoin.Client({
+  host: '127.0.0.1',
+  port: 12350,
+  user: 'namecoinrpc',
+  pass: '8FZDgUAy81XtZbERtPW37G9AUG89ShgLJQTcpuHFhCrN'
+});
+
+
+
+}
+
+
+
 all_clients = new Array();
 all_clients.push(bitcoin_client);
 all_clients.push(dogecoin_client);
 all_clients.push(litecoin_client);
 
+if ( ip.address() != '192.168.1.56'){
+all_clients.push(x11coin_client);
+all_clients.push(darkcoin_client);
+all_clients.push(ppcoin_client);
+all_clients.push(vericoin_client);
+all_clients.push(blackcoin_client);
+all_clients.push(namecoin_client);
+}
 
-var ip = require("ip");
+
 console.dir ( ip.address() );
 
 if ( ip.address() == '192.168.1.56')
@@ -5187,6 +5368,9 @@ console.log('coin saved');
 
 });
 
+
+
+
 dogecoin_client.getNewAddress(function(err, address) {
 
 dogecoin = new Coin({
@@ -5231,6 +5415,182 @@ bitcoin = new Coin({
 bitcoin.save(function(err){
 
 User.findOneAndUpdate({hash: token}, {$set: {bitcoin: bitcoin}},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+
+x11coin_client.getNewAddress(function(err, address) {
+
+x11coin = new Coin({
+    coin_name: 'x11coin',
+    code: 'x11',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+x11coin_client.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {x11coin: x11coin }},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+
+
+
+darkcoin_client.getNewAddress(function(err, address) {
+
+darkcoin = new Coin({
+    coin_name: 'darkcoin',
+    code: 'drk',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+darkcoin.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {darkcoin: darkcoin}},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+
+
+ppcoin_client.getNewAddress(function(err, address) {
+
+ppcoin = new Coin({
+    coin_name: 'ppcoin',
+    code: 'ppc',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+ppcoin.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {ppcoin: ppcoin}},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+vericoin_client.getNewAddress(function(err, address) {
+
+vericoin = new Coin({
+    coin_name: 'vericoin',
+    code: 'vrc',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+vericoin.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {vericoin: vericoin}},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+
+
+blackcoin_client.getNewAddress(function(err, address) {
+
+blackcoin = new Coin({
+    coin_name: 'blackcoin',
+    code: 'blk',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+blackcoin.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {blackcoin: blackcoin}},function(err, user){
+console.log("did find" + JSON.stringify(user));
+console.log("edited");
+
+});
+
+console.log('coin saved');
+
+});
+
+});
+
+
+namecoin_client.getNewAddress(function(err, address) {
+
+namecoin = new Coin({
+    coin_name: 'namecoin',
+    code: 'nmc',
+    user: user,
+    deposit_address: address,
+    confirmation: 1,
+    coin_number: 1,
+    withdraw_fee: .0002,
+    order_fee: .015
+});
+
+namecoin.save(function(err){
+
+User.findOneAndUpdate({hash: token}, {$set: {namecoin: namecoin}},function(err, user){
 console.log("did find" + JSON.stringify(user));
 console.log("edited");
 
@@ -5593,6 +5953,82 @@ console.log('here');
 email = req.session.user.email;
 console.log(email);
 
+if ( ip.address() != '192.168.1.56'){
+
+User
+.findOne({ email: email })
+.populate('opt_one deposits withdrawals orders dogecoin bitcoin litecoin x11coin darkcoin ppcoin vericoin blackcoin namecoin')
+.exec(function (err, data) {
+
+//console.log(data.orders);
+orders_populated  = new Array();
+//console.log('the data ' + data);
+//console.log(data.orders);
+if (data.orders.length != 0) {
+$.each(data.orders, function(keyb, valb){
+//console.log('here ' + keyb + ' ' + valb.variation_margin);
+console.log(valb.swap);
+
+Order.find({_id: valb._id}).populate({path: 'variation_margin',
+  match: { amount: { $ne: Infinity }},
+  //options: { limit: 5 }
+  }).exec(function( err, doc) {
+
+    console.log("aha");
+                //res.json(doc);
+                //console.log('here2 ' + doc);
+                orders_populated.push(doc);
+                console.log(keyb);
+                if (keyb == data.orders.length -1){
+                    //comparator
+                    function compare(a,b) {
+                      if (a.time > b.time)
+                         return -1;
+                      if (a.time < b.time)
+                        return 1;
+                      return 0;
+                    }
+
+
+
+                    data.deposits.sort(compare);
+                    data.withdrawals.sort(compare);
+                    data.orders.sort(compare);
+
+
+
+                    console.log('the ordersa ' + orders_populated);
+                    res.render('tab_template.html', {csrf: JSON.stringify(req.session._csrf), data: JSON.stringify(data), orders_populated: JSON.stringify(orders_populated)});
+
+
+                }
+
+            }); 
+
+      
+
+
+        });
+
+}
+else{
+
+    console.log("fucked");
+    console.log(data);
+res.render('tab_template.html', {csrf: JSON.stringify(req.session._csrf), data: JSON.stringify(data), orders_populated: JSON.stringify(null)});
+
+
+}
+
+
+});
+
+
+
+
+
+}
+else
 User
 .findOne({ email: email })
 .populate('opt_one deposits withdrawals orders dogecoin bitcoin litecoin')

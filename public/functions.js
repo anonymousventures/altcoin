@@ -358,7 +358,11 @@ expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 141816
 
 coin_selection = '';
 
+if (document.URL.indexOf('localhost') != -1 )
 coins = new Array("dogecoin", "litecoin");
+else
+coins = new Array("dogecoin", "litecoin", "x11coin", "darkcoin", "ppcoin", "vericoin", "blackcoin", "namecoin");
+
 
 $.each(coins, function(key,val){
 

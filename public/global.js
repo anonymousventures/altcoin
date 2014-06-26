@@ -3042,6 +3042,20 @@ else
     array.push(data.dogecoin);
     array.push(data.litecoin);
 
+  if (document.URL.indexOf('localhost') == -1 ){
+    array.push(data.x11coin);
+    array.push(data.darkcoin);
+    array.push(data.ppcoin);
+    array.push(data.vericoin);
+    array.push(data.blackcoin);
+    array.push(data.namecoin);
+
+
+
+  }
+
+
+
     array.sort(function(a,b){return a.coin_number - b.coin_number});
 
 
