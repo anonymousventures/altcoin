@@ -458,6 +458,15 @@ table_header = '<div class="table-responsive"><table class="table table-bordered
           </tr>\
         </thead><tbody>';
 
+if (key == 0)
+selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
+ <br> <select class="form-control select_coin" style="width:250px" >' + coin_selection + '</select><br>\
+    <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
+ <br> <select class="form-control select_option" style="width:250px" >' + option_selection + '</select><br>\
+ <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
+ <br> <select class="form-control select_expiration" style="width:250px" >' + expiration_selection + '</select><br>\
+ <button type="button" class="btn btn-primary" id="go_option"> Go </button><br><br>';
+else
 selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
  <br> <select class="form-control select_coin" style="width:250px" >' + coin_selection + '</select><br>\
     <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
@@ -868,6 +877,29 @@ function add_options_table_handlers(){
 
 
     });
+
+
+
+        $('#go_option').click(function() {
+        option_type = $('option:selected', $('.select_option')).attr('call_put');
+        $('.select_option').find('option[call_put="' + option_type +'"]').attr("selected",true);
+        //expiration_time = $('.select_expiration').attr('expiration_time');
+
+        coin_name = $('option:selected', $('.select_coin')).attr('coin_name');
+        $('.select_coin').find('option[coin_name="' + coin_name +'"]').attr("selected",true);
+
+        expiration_time = $('option:selected', $('.select_expiration')).attr('expiration_time');
+        $('.select_expiration').find('option[expiration_time="' + expiration_time  +'"]').attr("selected",true);
+
+
+
+    $('html, body').animate({
+        scrollTop: $('[call_put_anchor="' + option_type + '"][coin_name_anchor="' + coin_name + '"][expiration_time_anchor="' + expiration_time + '"]').offset().top - 300
+    }, 1000);
+
+
+    });
+
 
 
 
