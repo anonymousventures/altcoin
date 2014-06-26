@@ -1490,6 +1490,21 @@ Coin.aggregate(
         if (val.code == 'doge')
         current_price = 0.0000005;
 
+        if (val.code == 'x11')
+        current_price = 1;
+        if (val.code == 'drk')
+        current_price = 1;
+        if (val.code == 'ppc')
+        current_price = 1;
+        if (val.code == 'vrc')
+        current_price = 1;
+        if (val.code == 'blk')
+        current_price = 1;
+        if (val.code == 'nmc')
+        current_price = 1;
+
+
+
         price_deviation = current_price/10;
         starting = current_price - 3 * price_deviation;
 
