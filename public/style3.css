@@ -96,6 +96,10 @@ margin-right: 30px;
   cursor: pointer;
 }
 
+.options_page_href2{
+  cursor: pointer;
+}
+
 #top_area{
   margin-top: 50px;
   height: 295px;
