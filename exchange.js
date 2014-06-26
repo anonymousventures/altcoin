@@ -5441,7 +5441,7 @@ x11coin = new Coin({
     order_fee: .015
 });
 
-x11coin_client.save(function(err){
+x11coin.save(function(err){
 
 User.findOneAndUpdate({hash: token}, {$set: {x11coin: x11coin }},function(err, user){
 console.log("did find" + JSON.stringify(user));
