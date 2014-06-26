@@ -7514,7 +7514,7 @@ sendgrid.send({
 
 
 
-
+if ( ip.address() == '192.168.1.56')
 setInterval(function(){
 
 
@@ -7703,6 +7703,198 @@ Coin.findByIdAndUpdate(deposit.coin, {$inc:{pending_deposits: -1 * deposit.amoun
 
 }
 },8000);
+else
+setInterval(function(){
+
+
+for (var i=0; i<9; i++){
+(function(i){
+all_clients[i].getBlockCount(function(err, blockcount) {
+//console.log("begin first");
+coin_type = all_clients[i]['rpc']['opts']['user'];
+coin_type = coin_type.substr(0, coin_type.indexOf('coin'));
+coin_name = coin_type + 'coin';
+
+/*
+console.log(coin_name);
+console.log('block count ' + blockcount);
+console.log("end first");*/
+
+
+all_clients[i].getBlockHash(blockcount-2000, function(err, blockhash) {
+
+all_clients[i].listSinceBlock(blockhash, 1, function(err, transactions) {
+
+
+if (transactions != null && transactions != undefined){
+coin_type = all_clients[i]['rpc']['opts']['user'];
+coin_type = coin_type.substr(0, coin_type.indexOf('coin'));
+coin_name = coin_type + 'coin';
+
+
+
+/*
+console.log(coin_name);
+console.log('block count ' + blockcount);
+console.log(blockhash);
+console.log(transactions);
+*/
+
+//console.log(transactions);
+
+$.each(transactions['transactions'], function(key,val){
+transaction = val;
+txid = transaction['txid'];
+address = transaction['address'];
+amount = transaction['amount'];
+confirmations = transaction['confirmations'];
+//console.log('number of confirmations ' + confirmations);
+//process_transaction(txid, address_array, sent_address, amount);
+if ( transaction['category'] == 'receive'){
+
+//console.log("the amount " + amount);
+//console.log('here ' + address);
+
+(function(txid, address, amount, confirmations, coin_name){
+Coin.findOne({deposit_address: address}).populate('user').exec(function(err, coin){
+
+//console.log(coin);
+
+if (coin!= null){
+//console.log("in here");
+Deposit.findOne({txid: txid}, function(err, deposit){
+
+
+if (deposit == null){
+
+//console.log('the address ' + address + ' the amount ' + amount);
+
+Coin.findOneAndUpdate({deposit_address: address}, {$inc: {"pending_deposits": amount}}, function(err, coin){
+
+//console.log('updated coin ' + coin);
+
+coin_type = coin.coin_name.substr(0, coin.coin_name.indexOf('coin'));
+
+    var deposit = new Deposit({
+        time:  new Date().getTime(),
+        coin_name: coin_type + 'coin',
+        amount: amount,
+        deposit_address: address,
+        txid: txid,
+        coin: coin,
+        coin_ticker: coin.code
+    });
+
+id = coin.user;
+//console.log('daid' + id);
+User.findByIdAndUpdate(id,{$push: {deposits: deposit}}, function(err, user){
+//console.log(user);
+
+//console.log('shit has saved');
+
+});
+
+io.sockets.emit('deposit', {deposit: deposit});
+console.log('emit shit');
+
+   // console.log(deposit);
+
+    coin.deposits.push(deposit);
+    coin.save(function(err){
+        //console.log('coin updated');
+    });
+
+    deposit.save(function(err){
+        //console.log('saved');
+
+    });
+
+
+});
+
+
+
+}
+
+else{
+
+Coin.findOne({coin_name: coin_name}, function(err, coin){
+
+min_confirmations = coin['confirmation'];
+//console.log('min confirmations ' + min_confirmations);
+//console.log('my confirmations ' + confirmations);
+
+
+
+if (confirmations > min_confirmations){
+
+if (txid == '917cd84b5943035bd39753e62ad4fee0ea2d265f99f97625fbc40f77d4dcb901'){
+    //console.log(txid);
+    //console.log(confirmations);
+}
+
+Deposit.findOneAndUpdate({$and: [{pending: true}, {txid: txid}]},{$set: {pending: false}} ,function(err, deposit){
+
+
+
+//console.log("status changed" + txid + deposit);
+if (deposit != null){
+
+io.sockets.emit('deposit', {deposit: deposit});
+console.log('emit shit');
+//console.log('ahgod ' + deposit);
+console.log(deposit.amount);
+//console.log('deposit ' + deposit);
+
+Coin.findByIdAndUpdate(deposit.coin, {$inc:{pending_deposits: -1 * deposit.amount, balance: deposit.amount, available_balance: deposit.amount}},function(err, coin){
+//console.log('status changed coin' + coin);
+
+
+});
+
+}
+
+
+
+});
+
+
+}
+//else console.log('nonono')
+
+});
+
+}
+
+
+});
+}
+
+});
+}(txid, address, amount, confirmations, coin_name));
+
+
+}
+
+
+
+
+});
+
+
+}
+});
+
+}); 
+
+});
+}(i));
+
+}
+},24000);
+
+
+
 
 
 
