@@ -6776,7 +6776,7 @@ for (var i=0; i < 6; i++){
 
 
 $.each(prices, function(keyc, valc){
-
+console.log('change');
 
 $.each(option_types, function(keyd, vald){
 
