@@ -6717,7 +6717,7 @@ OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte:
 OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
 //find highest price in 24 hours
 OrderData.findOne({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
-Order.find({$and:[{coin_ticker_one: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+OrderData.find({$and:[{swap: true},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
 var bid_price;
 var ask_price;
@@ -6740,7 +6740,7 @@ console.log('da bid ' + bid_price);
 volume = 0;
 $.each(orders_within_day, function(key,val){
 
-volume += (val.quantity - val.quantity_left);
+volume += val.quantity;
 
 });
 
