@@ -3788,7 +3788,7 @@ password = $('#change_pass').val();
 confirm = $('#confirm_change_pass').val();
 email = localStorage.getItem('email');
 
-alert(email);
+//alert(email);
 
 if ( password != confirm)
   alert('Please make sure that the passwords are the same!');
