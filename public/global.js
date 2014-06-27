@@ -3142,7 +3142,7 @@ yolo ='<table class="table" id="tab_table">\
 
 
 
-b_string = 'Select coin to deposit to get deposit address: <br> <br><select id="select_deposit" class="form-control" style="width:100px">';
+b_string = 'Select coin: <br> <br><select id="select_deposit" class="form-control" style="width:100px">';
 
 $.each(array, function(key,val){
 
@@ -3150,7 +3150,8 @@ b_string += '<option value="'+ val.coin_name + '">' + first_letter_upper(val.coi
 
 });
 
-b_string += '</select><div id="address_info">To add bitcoins, send to this address: <span style="font-weight: bold">' + data.bitcoin.deposit_address + '</span></div>';
+b_string += '</select><div id="address_info">To add bitcoins, send to this address: <span style="font-weight: bold">' + data.bitcoin.deposit_address + '</span></div>\
+<br> * May take up to 30 seconds to detect deposit, and 5 to 20 minutes to confirm deposit (depending on coin)';
 
 
 
