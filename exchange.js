@@ -1069,7 +1069,190 @@ res.render('trade_coins.html', {activated: req.session.activated, user: JSON.str
 });
 
 }
-else res.redirect('/login');
+else {
+
+
+
+coin1 = req.params.coin1;
+coin2 = req.params.coin2;
+coin2 = 'btc';
+
+
+//csrf = req.session._csrf;
+console.log('csrf ' + req.session._csrf);
+
+current_time = Math.floor(new Date().getTime()/1000);
+one_day_ago = current_time - (60 * 60 * 24);
+
+
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+//find all orders within past day
+Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+//find last order
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+
+Coin.findOne({code: coin1}, function(err, coin_one){
+Coin.findOne({code: coin2}, function(err, coin_two){
+//User.findOne({email: req.session.user.email}).populate(coin_one.coin_name + ' ' + coin_two.coin_name).exec(function (err, coin) {
+
+//console.log('yolo ' + req.session.user.email);
+
+// console.log('da coin ' + coin);
+// console.log(coin_one.coin_name);
+coin_one_balance = 0;
+coin_two_balance = 0;
+
+coin_one_name = coin_one.coin_name;
+coin_two_name = coin_two.coin_name;
+
+
+
+
+if (last_order == null){
+last_price = null;
+low_price = null;
+high_price = null;
+volume = 0;
+}
+else{
+last_price = last_order.price;
+low_price = lowest_order.price;
+high_price = highest_order.price;
+
+
+console.log('last_price ' + last_price);
+console.log('low price ' + low_price);
+console.log('high price ' + high_price);
+
+volume = 0;
+$.each(orders_within_day, function(key,val){
+
+volume += (val.quantity - val.quantity_left);
+
+});
+
+volume = volume/2;
+console.log('volume ' + volume);
+console.log('pending asks ' + pending_asks);
+console.log('pending bids ' + pending_bids);
+
+}
+
+
+OrderData.find({$and: [{swap: false}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
+//console.log('fucked ' + order_data);
+object = new Object();
+
+$.each(order_data, function(key,val){
+minute_grouping = Math.floor(new Date(val.time).getTime()/ (1000 * 60));
+
+
+if (object[minute_grouping] === undefined){
+    subarray = new Array();
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+else{
+    subarray = object[minute_grouping];
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+
+
+});
+
+console.log('sharray ' + JSON.stringify(object));
+
+chart_array = new Array();
+
+$.each(object, function(key,val){
+
+
+volume = 0;
+$.each(val, function(keyb,valb){
+
+volume += valb.quantity;
+if (keyb == 0){
+lowest_price = valb.price;
+highest_price = valb.price;
+open_price = valb.price;
+}
+else{
+if (valb.price > highest_price)
+    highest_price = valb.price;
+if (valb.price < lowest_price)
+    lowest_price = valb.price;
+}
+
+if (keyb == val.length -1){
+close_price = valb.price;
+}
+});
+subobject = new Object();
+subobject.low = lowest_price;
+subobject.high = highest_price;
+subobject.open = open_price;
+subobject.close = close_price;
+subobject.volume = volume;
+subobject.date = key * 1000 * 60;
+
+chart_array.push(subobject);
+
+
+});
+if (pending_asks.length == 0)
+    pending_asks = null;
+if (pending_bids.length == 0 )
+    pending_bids = null;
+
+console.log('\r\n');
+console.log(JSON.stringify(chart_array));
+console.log(volume);
+console.log(last_price);
+console.log(low_price);
+console.log(high_price);
+console.log(coin_one_name);
+console.log(coin_two_name);
+console.log(coin1);
+console.log(coin2);
+console.log(pending_asks);
+console.log(pending_bids);
+
+if (last_price == null)
+    last_price = 0;
+if (low_price == null)
+    low_price = 0;
+if (high_price == null)
+    high_price = 0;
+
+
+
+
+res.render('trade_coins.html', {activated: JSON.stringify(false), user: JSON.stringify(null), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+
+});
+
+
+//});
+});
+});
+});
+});
+});
+
+
+});
+});
+});
+
+
+}
+
 
 });
 
@@ -1275,7 +1458,192 @@ res.render('trade_options.html', {kind: JSON.stringify(kind), activated: req.ses
 });
 
 }
-else res.redirect('/login');
+else {
+
+
+coin1 = req.params.coin1;
+coin2 = req.params.coin2;
+kind = req.params.kind
+strike = req.params.strike;
+expiration = req.params.expiration;
+
+coin2 = 'btc';
+
+
+//csrf = req.session._csrf;
+console.log('csrf ' + req.session._csrf);
+
+current_time = Math.floor(new Date().getTime()/1000);
+one_day_ago = current_time - (60 * 60 * 24);
+
+
+
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+//find all orders within past day
+Order.find({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+//find last order
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+Order.findOne({$and:[{call_put: kind}, {strike: strike}, {expiration_time: expiration},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {swap: false}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+
+Coin.findOne({code: coin1}, function(err, coin_one){
+Coin.findOne({code: coin2}, function(err, coin_two){
+//User.findOne({email: req.session.user.email}).populate(coin_one.coin_name + ' ' + coin_two.coin_name).exec(function (err, coin) {
+
+coin_one_name = coin_one.coin_name;
+coin_two_name = coin_two.coin_name;
+
+// console.log('da coin ' + coin);
+// console.log(coin_one.coin_name);
+coin_one_balance = 0;
+coin_two_balance = 0;
+
+
+
+
+if (last_order == null){
+last_price = null;
+low_price = null;
+high_price = null;
+volume = 0;
+}
+else{
+last_price = last_order.price;
+low_price = lowest_order.price;
+high_price = highest_order.price;
+
+
+console.log('last_price ' + last_price);
+console.log('low price ' + low_price);
+console.log('high price ' + high_price);
+
+volume = 0;
+$.each(orders_within_day, function(key,val){
+
+volume += (val.quantity - val.quantity_left);
+
+});
+
+volume = volume/2;
+console.log('volume ' + volume);
+console.log('pending asks ' + pending_asks);
+console.log('pending bids ' + pending_bids);
+
+}
+
+console.log(coin1);
+console.log(coin2);
+OrderData.find({$and: [{strike: strike}, {expiration: expiration}, {call_put: kind}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
+//console.log('fucked ' + order_data);
+object = new Object();
+
+$.each(order_data, function(key,val){
+minute_grouping = Math.floor(new Date(val.time).getTime()/ (1000 * 60));
+
+
+if (object[minute_grouping] === undefined){
+    subarray = new Array();
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+else{
+    subarray = object[minute_grouping];
+    subarray.push(val);
+    object[minute_grouping] = subarray;
+}
+
+
+});
+
+console.log('sharray ' + JSON.stringify(object));
+
+chart_array = new Array();
+
+$.each(object, function(key,val){
+
+
+volume = 0;
+$.each(val, function(keyb,valb){
+
+volume += valb.quantity;
+if (keyb == 0){
+lowest_price = valb.price;
+highest_price = valb.price;
+open_price = valb.price;
+}
+else{
+if (valb.price > highest_price)
+    highest_price = valb.price;
+if (valb.price < lowest_price)
+    lowest_price = valb.price;
+}
+
+if (keyb == val.length -1){
+close_price = valb.price;
+}
+});
+subobject = new Object();
+subobject.low = lowest_price;
+subobject.high = highest_price;
+subobject.open = open_price;
+subobject.close = close_price;
+subobject.volume = volume;
+subobject.date = key * 1000 * 60;
+
+chart_array.push(subobject);
+
+
+});
+
+
+
+if (pending_asks == '')
+    pending_asks = null;
+if (pending_bids == '')
+    pending_bids = null;
+
+console.log('\r\n');
+console.log(JSON.stringify(chart_array));
+console.log(volume);
+console.log(last_price);
+console.log(low_price);
+console.log(high_price);
+console.log(coin1);
+console.log(coin2);
+console.log(pending_asks);
+console.log(pending_bids);
+
+if (last_price == null)
+    last_price = 0;
+if (low_price == null)
+    low_price = 0;
+if (high_price == null)
+    high_price = 0;
+
+
+
+
+res.render('trade_options.html', {kind: JSON.stringify(kind), activated: JSON.stringify(false), user: JSON.stringify(null), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+
+});
+
+
+//});
+});
+});
+});
+});
+});
+
+
+});
+});
+});
+
+}
 
 });
 

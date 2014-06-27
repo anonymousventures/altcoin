@@ -244,7 +244,7 @@ string += '</tbody></table></div>\
 
 middle_area = '<div class="index_col col-md-3 col-lg-3 col-sm-3 col-xs-3"><img style="height:50px" class="index_icon" src=\"' + prefix + '/img/trade_icon.png' +  '\">\
   <h3 class=\"desc\">Fast Trading </h3>\
-  <h5 class=\"col-md-12 desc\"> Trade in real-time with live updating.</h5>\
+  <h5 class=\"col-md-12 desc\"> Trade in real-time and process orders in milliseconds.</h5>\
   </div>\
   <div class=\"index_col col-md-3 col-lg-3 col-sm-3 col-xs-3\"><img style=\"height:80px; margin-top: 12px\" class=\"index_icon\"  src=\"' + prefix + '/img/low_fees.png' +  '\">\
   <h3 class=\"desc\" style=\"margin-top: 10px\">No fees </h3>\
