@@ -4416,11 +4416,11 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         //update bid order
         console.log('yoloa '  + key + ' ' + ask_quantity_left);
         if (bid_quantity_left == ask_quantity_left)
-            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: quantity_left, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
+            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: 0, pending: 'complete', last_trade_time: new Date().getTime()}}, function(err, order){
 
             });
         else
-            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: quantity_left, last_trade_time: new Date().getTime()}}, function(err, order){
+            Order.findByIdAndUpdate(bid_order_id, {$set: {quantity_left: bid_quantity_left - ask_quantity_left, last_trade_time: new Date().getTime()}}, function(err, order){
 
             });
 
@@ -4616,7 +4616,7 @@ console.log("fuckingtest" + bid_quantity_left + ' ' + ask_quantity_left);
         User.findById(val['user']).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, buyer){
             buyer[coin_one_name].update({$inc: {available_balance: bid_quantity_left, balance: bid_quantity_left}}, { w: 1 }, function(err){
 
-                //sell_price = bid_quantity_left * bid_price;
+                sell_price = bid_quantity_left * bid_price;
                 buyer[coin_two_name].update({$inc: {in_orders_non_margin: -1 * sell_price, balance: -1 * sell_price}}, { w: 1 }, function(err){
                     req.session.processing_sell = false;
                     res.end('done');
@@ -8459,10 +8459,15 @@ app.post('/cancel_order', function(req,res){
 
 console.log(req.body.order_id);
 
-Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'cancelled'}}, function(err, order){
+Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'cancelled'}}).populate('user').exec(function(err, order){
 
 console.log("order cancelled");
 res.end("done");
+
+
+
+
+
 });
 
 
@@ -8474,10 +8479,75 @@ app.post('/cancel_alt_order', function(req,res){
 
 console.log(req.body.order_id);
 
-Order.findByIdAndUpdate(req.body.order_id, {$set: {pending: 'cancelled'}}, function(err, order){
+//, {$set: {pending: 'cancelled'}}
+
+Order.findOneAndUpdate({ $and: [{_id: req.body.order_id}, {pending: 'pending'}]}, {$set: {pending: 'cancelled'}}).populate('user').exec( function(err, order){
+
+console.log(1);
+
+
+
+console.log(2);
+
+coin_one_name = order.coin_one_name;
+coin_two_name = 'bitcoin';
+user = order['user'];
+
+if (order.side == 'bid'){
+
+change = order.quantity_left * order.price;
+
+User.findByIdAndUpdate(user).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+console.log('fucking yolo');
+console.log(change);
+
+console.log(user[coin_two_name]);
+
+user[coin_two_name].update({$inc: {available_balance: change, in_orders_non_margin: -1 * change}}).exec();
+
 
 console.log("order cancelled");
 res.end("done");
+
+
+});
+
+
+}
+else {
+
+
+console.log('what the fuck');
+
+User.findByIdAndUpdate(user).populate(coin_one_name + ' ' + coin_two_name).exec(function(err, user){
+
+console.log('fucking yolo');
+//console.log(change);
+
+//console.log(user[coin_two_name]);
+
+user[coin_one_name].update({$inc: {available_balance: order.quantity_left, in_orders_non_margin: -1 * order.quantity_left}}).exec();
+
+
+console.log("order cancelled");
+res.end("done");
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+// console.log("order cancelled");
+// res.end("done");
 });
 
 

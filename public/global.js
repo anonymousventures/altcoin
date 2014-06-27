@@ -1492,7 +1492,7 @@ if (val.pending == 'pending' && val.swap == true){
 /*"time" : 1400544396647, "coin_one_ticker" : "doge", "coin_two_ticker" : "btc", "side" : "ask", "price" : 150, "quantity" : 1, "quantity_left" : 1, 
 "user" : ObjectId("5377ff1015a0a90000000001"), "_id" : ObjectId("537a9c8cec45c0b264000001"), "pending" : "pending"
 */
-if (val.type == 'ask')
+if (val.side == 'ask')
   type = 'SELL';
 else
   type = 'BUY';
@@ -1517,10 +1517,10 @@ substring = '<tr id="tab_row">\
         <td class="tab_td_order">' + val.coin_one_ticker.toUpperCase() + '/' + val.coin_two_ticker.toUpperCase() + '</td>\
         <td class="tab_td_order">' + order_time + '</td>\
         <td class="tab_td_order">' + val.price + '</td>\
-        <td class="tab_td_order">' + (val.quantity - val.quantity_left) + '</td>\
-        <td class="tab_td_order">' + (val.quantity - val.quantity_left)  * val.price + '</td>\
+        <td class="tab_td_order">' + (val.quantity_left) + '</td>\
+        <td class="tab_td_order">' + (val.quantity_left)  * val.price + '</td>\
         <td class="tab_td_order">' + '0.00' + '</td>\
-        <td class="tab_td_order">' + (val.quantity - val.quantity_left)  * val.price + '</td>\
+        <td class="tab_td_order">' + (val.quantity_left)  * val.price + '</td>\
         <td class="tab_td_order">\
         <a class="cancel_alt_order" href="#" order_id="' + val._id + '">\
         <img src="' + prefix + 'img/delete.png"   alt="Cancel"  class="2x" width="16" style="margin-left: 14px"><br>  Cancel </a>\
