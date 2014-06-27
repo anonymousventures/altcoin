@@ -901,10 +901,10 @@ current_time = Math.floor(new Date().getTime()/1000);
 one_day_ago = current_time - (60 * 60 * 24);
 
 
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
 //find all orders within past day
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 //find last order
 Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
@@ -963,7 +963,7 @@ console.log('pending bids ' + pending_bids);
 
 console.log(coin1);
 console.log(coin2);
-OrderData.find({$and: [{swap: false}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
+OrderData.find({$and: [{swap: true}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
 
@@ -1085,10 +1085,10 @@ current_time = Math.floor(new Date().getTime()/1000);
 one_day_ago = current_time - (60 * 60 * 24);
 
 
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'ask'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: 1}).exec( function(err, pending_asks){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {pending: 'pending'}, {side: 'bid'}, {pending: {'$ne': 'cancelled' }}]}).sort({price: -1}).exec(function(err, pending_bids){
 //find all orders within past day
-Order.find({$and:[{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+Order.find({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 //find last order
 Order.findOne({$and:[{swap: true},{coin_one_ticker: coin1}, {coin_two_ticker: coin2}, {last_trade_time: {'$ne': null }}, {pending: {'$ne': 'cancelled' }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
 //find lowest price in 24 hours
@@ -1144,7 +1144,7 @@ console.log('pending bids ' + pending_bids);
 }
 
 
-OrderData.find({$and: [{swap: false}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
+OrderData.find({$and: [{swap: true},{coin_ticker_one: coin1}, {coin_ticker_two: coin2}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
 
@@ -2000,7 +2000,7 @@ Coin.aggregate(
                             coin_ticker_two: 'btc',
                             price: bid_price,
                             quantity: bid_quantity,
-                            swap: false
+                            swap: true
         });
 
         order_data.save(function(err){
