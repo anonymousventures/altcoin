@@ -8647,7 +8647,7 @@ Withdrawal.findOneAndUpdate({$and:[{hash: hash}, {pending: true}]}, {$set: {pend
 if (withdrawal != null){
 res.render('withdraw_confirm.html', {activated: activated, user: JSON.stringify(user)});
 
-Coin.findByIdAndUpdate(withdrawal.coin._id, {$inc:{balance: -1 * (withdrawal.amount + withdrawal.fee), pending_withdrawals: -1 * (withdrawal.amount - withdrawal.fee)}} , function(err, coin){
+Coin.findByIdAndUpdate(withdrawal.coin._id, {$inc:{balance: -1 * (withdrawal.amount), pending_withdrawals: -1 * (withdrawal.amount - withdrawal.fee)}} , function(err, coin){
 
 console.log("updated coin");
 
