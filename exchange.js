@@ -1988,7 +1988,7 @@ Coin.aggregate(
 
     $.each(result, function(key,val){
 
-        for (var i=0; i<3; i++){
+        for (var i=0; i<25; i++){
 
         random = getRandomArbitrary(low_limit, current_time);
         bid_quantity = getRandomArbitrary(1,15);
