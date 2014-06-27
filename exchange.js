@@ -6459,8 +6459,9 @@ console.log(lowest_order);
 });
 
 
-app.get('/save_data', function(req,res){
+app.get('/save_data/:flag', function(req,res){
 
+flag = req.params.flag;
 
 expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
 
@@ -6613,6 +6614,7 @@ console.log(valb);
 array.push(obj);
 
 
+if (flag == false){
 pairdata = new PairData({
     coin_ticker_one: val.code,
     coin_ticker_two: 'btc',
@@ -6633,6 +6635,24 @@ pairdata = new PairData({
 pairdata.save(function(err){
     console.log('yolo');
 })
+}else{
+
+
+PairData.findOneAndUpdate({$and: [{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}]}, {$set: {
+  last: obj.last,
+    low: obj.low,
+    high: obj.high,
+    bid: bid_price,
+    ask: ask_price,
+    volume: volume  
+}}).exec();
+
+
+
+
+
+
+}
 
 
 if (array.length == coins.length * 4 * 6 * 2){
@@ -6704,7 +6724,246 @@ console.log('this array ' + JSON.stringify(array));
 });
 
 
-app.get('/options2', function(req,res){
+
+
+setInterval(function(){
+
+expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+
+
+current_time = new Date().getTime()/1000;
+one_day_ago = current_time - (60 * 60 * 24 * 1000);
+
+array = new Array();
+option_types = new Array("CALL", "PUT");
+
+
+Coin.find().distinct('coin_name', function(err, coins) {
+
+coins.splice( $.inArray('bitcoin', coins), 1 );
+//coins.splice( $.inArray('litecoin', coins), 1 );
+console.log(coins);
+
+Coin.aggregate( 
+       {$match   : {coin_name: {$in: coins }}}, 
+       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+  ).exec(function(err, result){
+
+
+    // ids is an array of all ObjectIds
+
+
+
+$.each(result, function(key,val){
+
+$.each(expiration_times, function(keyb,valb){
+
+
+(function(key,val,keyb, valb){
+
+if (val.code == 'ltc')
+current_price = .016;
+if (val.code == 'doge')
+current_price = 0.0000005;
+
+
+if (val.code == 'x11')
+current_price = 1;
+if (val.code == 'drk')
+current_price = 1;
+if (val.code == 'ppc')
+current_price = 1;
+if (val.code == 'vrc')
+current_price = 1;
+if (val.code == 'blk')
+current_price = 1;
+if (val.code == 'nmc')
+current_price = 1;
+
+
+price_deviation = current_price/10;
+starting = current_price - 3 * price_deviation;
+
+prices = new Array();
+
+for (var i=0; i < 6; i++){
+    
+    price = starting + i * price_deviation;
+    prices.push(price.toFixed(9));
+
+}
+
+
+
+$.each(prices, function(keyc, valc){
+$.each(option_types, function(keyd, vald){
+
+
+
+console.log('fucking price ' + valc);
+//valc = valc.toFixed(9);
+(function(keyc,valc,keyd,vald){    
+Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+//find lowest price in 24 hours
+OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+//find highest price in 24 hours
+OrderData.findOne({$and:[{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+//Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
+OrderData.find({$and:[{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).exec(function(err, orders_within_day){
+
+//lowest_order = null;
+//orders_within_day = [];
+
+var bid_price;
+var ask_price;
+
+console.log('stupid' + val.coin_name + ' ' + valb + ' ' + orders_within_day)
+
+if (bid == null)
+bid_price = 0;
+else
+bid_price = bid.price;
+
+
+if (ask == null)
+ask_price = 0;
+else
+ask_price = ask.price;
+
+console.log('da bid ' + bid_price);
+console.log('wtf' + orders_within_day[0]);
+volume = 0;
+if (orders_within_day != undefined && orders_within_day != null ){
+$.each(orders_within_day, function(key,valz){
+
+//console.log('rage '  + JSON.stringify(valz));
+volume += valz.quantity;
+
+});
+}
+else volume = 0;
+
+volume = volume/2;
+
+console.log('im confused ' + valc);
+
+obj = new Object();
+obj.coin_one_name = val.coin_name;
+obj.coin_two_name = 'bitcoin';
+obj.coin_one_ticker = val.code;
+obj.coin_two_ticker = 'btc';
+obj.bid = bid_price;
+obj.ask = ask_price;
+
+if (lowest_order == null){
+obj.low = 0;
+obj.high = 0;
+obj.last = 0;
+}
+else{
+obj.low = lowest_order.price;
+obj.high = highest_order.price;
+obj.last = last_order.price;
+}
+
+obj.volume = volume;
+obj.expiration = valb;
+obj.strike = valc;
+obj.call_put = vald;
+
+console.log(valb);
+
+array.push(obj);
+
+
+
+
+
+PairData.findOneAndUpdate({$and: [{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}]}, {$set: {
+  last: obj.last,
+    low: obj.low,
+    high: obj.high,
+    bid: bid_price,
+    ask: ask_price,
+    volume: volume  
+}}).exec();
+
+
+
+
+
+if (array.length == coins.length * 4 * 6 * 2){
+
+
+
+array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
+
+console.log(array);
+
+// modified_array = new Array();
+// $.each(array, function(key,val){
+
+
+
+
+// });
+
+activated = req.session.activated;
+user = req.session.user;
+
+console.log('status ' + activated);
+
+if (activated != true)
+    activated = false;
+if (user == undefined)
+    user = null;
+
+console.log('later status ' + activated);
+
+console.log('this array ' + JSON.stringify(array));
+//res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(user), activated: JSON.stringify(activated)});
+
+}
+
+
+});
+});
+});
+});
+
+
+});
+});
+})(keyc, valc, keyd,vald);
+});
+});
+
+
+
+
+})(key,val, keyb, valb);
+
+});
+});
+
+
+
+
+  });
+
+
+
+
+
+});
+},60000 * 20000 );
+
+
+
+app.get('/options', function(req,res){
 
 
 expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
@@ -6886,221 +7145,221 @@ res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringi
 
 });
 
-app.get('/options', function(req,res){
+// app.get('/options', function(req,res){
 
 
-expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
+// expiration_times = new Array(1404259200000, 1404950400000, 1407628800000, 1418169600000);
 
 
-current_time = new Date().getTime()/1000;
-one_day_ago = current_time - (60 * 60 * 24 * 1000);
+// current_time = new Date().getTime()/1000;
+// one_day_ago = current_time - (60 * 60 * 24 * 1000);
 
-array = new Array();
-option_types = new Array("CALL", "PUT");
-
-
-Coin.find().distinct('coin_name', function(err, coins) {
-
-coins.splice( $.inArray('bitcoin', coins), 1 );
-coins.splice( $.inArray('litecoin', coins), 1 );
-console.log(coins);
-
-Coin.aggregate( 
-       {$match   : {coin_name: {$in: coins }}}, 
-       {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
-       {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
-  ).exec(function(err, result){
+// array = new Array();
+// option_types = new Array("CALL", "PUT");
 
 
-    // ids is an array of all ObjectIds
+// Coin.find().distinct('coin_name', function(err, coins) {
+
+// coins.splice( $.inArray('bitcoin', coins), 1 );
+// coins.splice( $.inArray('litecoin', coins), 1 );
+// console.log(coins);
+
+// Coin.aggregate( 
+//        {$match   : {coin_name: {$in: coins }}}, 
+//        {$group   : {_id:"$coin_name", code: {$first:"$code"}, coin_number: {$first:"$coin_number"}} },
+//        {$project : {coin_name:"$_id", code: "$code", coin_number: "$coin_number", _id:0}}
+//   ).exec(function(err, result){
+
+
+//     // ids is an array of all ObjectIds
 
 
 
-$.each(result, function(key,val){
+// $.each(result, function(key,val){
 
-$.each(expiration_times, function(keyb,valb){
-
-
-(function(key,val,keyb, valb){
-
-if (val.code == 'ltc')
-current_price = .016;
-if (val.code == 'doge')
-current_price = 0.0000005;
+// $.each(expiration_times, function(keyb,valb){
 
 
-if (val.code == 'x11')
-current_price = 1;
-if (val.code == 'drk')
-current_price = 1;
-if (val.code == 'ppc')
-current_price = 1;
-if (val.code == 'vrc')
-current_price = 1;
-if (val.code == 'blk')
-current_price = 1;
-if (val.code == 'nmc')
-current_price = 1;
+// (function(key,val,keyb, valb){
+
+// if (val.code == 'ltc')
+// current_price = .016;
+// if (val.code == 'doge')
+// current_price = 0.0000005;
 
 
-price_deviation = current_price/10;
-starting = current_price - 3 * price_deviation;
+// if (val.code == 'x11')
+// current_price = 1;
+// if (val.code == 'drk')
+// current_price = 1;
+// if (val.code == 'ppc')
+// current_price = 1;
+// if (val.code == 'vrc')
+// current_price = 1;
+// if (val.code == 'blk')
+// current_price = 1;
+// if (val.code == 'nmc')
+// current_price = 1;
 
-prices = new Array();
 
-for (var i=0; i < 6; i++){
+// price_deviation = current_price/10;
+// starting = current_price - 3 * price_deviation;
+
+// prices = new Array();
+
+// for (var i=0; i < 6; i++){
     
-    price = starting + i * price_deviation;
-    prices.push(price);
+//     price = starting + i * price_deviation;
+//     prices.push(price);
 
-}
-
-
-
-$.each(prices, function(keyc, valc){
-$.each(option_types, function(keyd, vald){
+// }
 
 
 
-console.log('fucking price ' + valc);
-
-(function(keyc,valc,keyd,vald){    
-Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
-Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
-OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
-//find lowest price in 24 hours
-OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
-//find highest price in 24 hours
-OrderData.findOne({$and:[{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
-//Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
-
-lowest_order = null;
-orders_within_day = [];
-
-var bid_price;
-var ask_price;
-
-console.log('stupid' + val.coin_name + ' ' + valb + ' ' + orders_within_day)
-
-if (bid == null)
-bid_price = 'n/a';
-else
-bid_price = bid.price;
-
-
-if (ask == null)
-ask_price = 'n/a';
-else
-ask_price = ask.price;
-
-console.log('da bid ' + bid_price);
-
-volume = 0;
-$.each(orders_within_day, function(key,val){
-
-volume += (val.quantity - val.quantity_left);
-
-});
-
-volume = volume/2;
-
-console.log('im confused ' + valc);
-
-obj = new Object();
-obj.coin_one_name = val.coin_name;
-obj.coin_two_name = 'bitcoin';
-obj.coin_one_ticker = val.code;
-obj.coin_two_ticker = 'btc';
-obj.bid = bid_price;
-obj.ask = ask_price;
-
-if (lowest_order == null){
-obj.low = 0;
-obj.high = 0;
-obj.last = 0;
-}
-else{
-obj.low = lowest_order.price;
-obj.high = highest_order.price;
-obj.last = last_order.price;
-}
-
-obj.volume = volume;
-obj.expiration = valb;
-obj.strike = valc;
-obj.call_put = vald;
-
-console.log(valb);
-
-array.push(obj);
-
-if (array.length == coins.length * 4 * 6 * 2){
+// $.each(prices, function(keyc, valc){
+// $.each(option_types, function(keyd, vald){
 
 
 
-array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
+// console.log('fucking price ' + valc);
 
-console.log(array);
+// (function(keyc,valc,keyd,vald){    
+// Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'bid'}, {pending: 'pending'}]}).sort({price: -1}).limit(1).exec(function(err, bid){
+// Order.findOne({$and: [{call_put: vald}, {strike: valc}, {expiration_time: valb}, {coin_one_name: val.coin_name}, {coin_two_name: 'bitcoin'}, {side: 'ask'}, {pending: 'pending'}]}).sort({price: 1}).limit(1).exec(function(err, ask){
+// OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort('-last_trade_time').limit(1).exec(function(err, last_order){
+// //find lowest price in 24 hours
+// OrderData.findOne({$and:[{swap: false },{call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: 1}).limit(1).exec(function(err, lowest_order){
+// //find highest price in 24 hours
+// OrderData.findOne({$and:[{swap: false }, {call_put: vald}, {strike: valc}, {expiration: valb},{coin_ticker_one: val.code}, {time: {$gte: one_day_ago }}]}).sort({price: -1}).limit(1).exec(function(err, highest_order){
+// //Order.find({$and:[{strike: valc}, {expiration_time: valb}, {coin_one_ticker: val.code}, {time: {$gte: one_day_ago}}, {pending: {'$ne': 'cancelled' }}]}, function(err, orders_within_day){
 
-// modified_array = new Array();
-// $.each(array, function(key,val){
+// lowest_order = null;
+// orders_within_day = [];
+
+// var bid_price;
+// var ask_price;
+
+// console.log('stupid' + val.coin_name + ' ' + valb + ' ' + orders_within_day)
+
+// if (bid == null)
+// bid_price = 'n/a';
+// else
+// bid_price = bid.price;
+
+
+// if (ask == null)
+// ask_price = 'n/a';
+// else
+// ask_price = ask.price;
+
+// console.log('da bid ' + bid_price);
+
+// volume = 0;
+// $.each(orders_within_day, function(key,val){
+
+// volume += (val.quantity - val.quantity_left);
+
+// });
+
+// volume = volume/2;
+
+// console.log('im confused ' + valc);
+
+// obj = new Object();
+// obj.coin_one_name = val.coin_name;
+// obj.coin_two_name = 'bitcoin';
+// obj.coin_one_ticker = val.code;
+// obj.coin_two_ticker = 'btc';
+// obj.bid = bid_price;
+// obj.ask = ask_price;
+
+// if (lowest_order == null){
+// obj.low = 0;
+// obj.high = 0;
+// obj.last = 0;
+// }
+// else{
+// obj.low = lowest_order.price;
+// obj.high = highest_order.price;
+// obj.last = last_order.price;
+// }
+
+// obj.volume = volume;
+// obj.expiration = valb;
+// obj.strike = valc;
+// obj.call_put = vald;
+
+// console.log(valb);
+
+// array.push(obj);
+
+// if (array.length == coins.length * 4 * 6 * 2){
+
+
+
+// array.sort(dynamicSortMultiple("coin_one_name","call_put", "expiration", "strike"));
+
+// console.log(array);
+
+// // modified_array = new Array();
+// // $.each(array, function(key,val){
+
+
+
+
+// // });
+
+// activated = req.session.activated;
+// user = req.session.user;
+
+// console.log('status ' + activated);
+
+// if (activated != true)
+//     activated = false;
+// if (user == undefined)
+//     user = null;
+
+// console.log('later status ' + activated);
+
+// console.log('this array ' + JSON.stringify(array));
+// res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(user), activated: JSON.stringify(activated)});
+
+// }
+
+
+// //});
+// });
+// });
+// });
+
+
+// });
+// });
+// })(keyc, valc, keyd,vald);
+// });
+// });
+
+
+
+
+// })(key,val, keyb, valb);
+
+// });
+// });
+
+
+
+
+//   });
+
 
 
 
 
 // });
 
-activated = req.session.activated;
-user = req.session.user;
 
-console.log('status ' + activated);
-
-if (activated != true)
-    activated = false;
-if (user == undefined)
-    user = null;
-
-console.log('later status ' + activated);
-
-console.log('this array ' + JSON.stringify(array));
-res.render('options.html', {coins: JSON.stringify(coins),coin_data: JSON.stringify(array), user: JSON.stringify(user), activated: JSON.stringify(activated)});
-
-}
-
-
-//});
-});
-});
-});
-
-
-});
-});
-})(keyc, valc, keyd,vald);
-});
-});
-
-
-
-
-})(key,val, keyb, valb);
-
-});
-});
-
-
-
-
-  });
-
-
-
-
-
-});
-
-
-});
+// });
 
 
 
