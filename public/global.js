@@ -3075,7 +3075,7 @@ else
 
 
 
-a_string = ' *Net in orders denotes how much your balance will go down by if all your orders are processed.<br><br>';
+a_string = ' *Net in orders denotes how much your balance will change by if all your orders are processed.<br><br>';
 
 $.each(array, function(key,val){
 

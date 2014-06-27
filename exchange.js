@@ -8759,7 +8759,7 @@ console.log('shit has saved');
 confirm_url = prefix + 'withdraw/confirm/' + token;
 
 sendgrid.send({
-  to:       req.body.email,
+  to:       req.session.user.email,
   from:     'info@GenesisBlock.io',
   subject:  'Confirm Withdrawal',
   text:     confirm_url,
