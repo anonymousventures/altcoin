@@ -5591,7 +5591,9 @@ console.log('c');
 app.post('/change_password', csrf, function(req,res){
 new_pass = req.body.password;
 
-
+console.log(req.session.activated);
+console.log(req.session.user.email);
+console.log(req.body.email);
 
 if (req.session.activated && req.session.user.email == req.body.email){
 
