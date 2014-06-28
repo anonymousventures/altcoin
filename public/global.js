@@ -62,7 +62,10 @@ $.noty.defaults = {
 
 //end noty
 
+if (document.URL.indexOf('localhost') != -1 )
 var socket = io.connect('http://localhost');
+else
+var socket = io.connect('http://genesisblock.io');
 
 
 socket.on('fuck', function (data) {
