@@ -5615,7 +5615,7 @@ res.end('done');
 
 app.post('/login', function(req,res){
 
-email = req.body.email;
+email = req.body.email.toLowerCase();
 password = req.body.password;
 
 User.findOne({email: email}, function(err, user){
@@ -5699,7 +5699,7 @@ body = req.body;
 
 console.log(body);
 
-User.findOne({email: body.email}, function(err, user){
+User.findOne({email: body.email.toLowerCase()}, function(err, user){
 
 console.log(user);
 if (user != null){
@@ -5720,7 +5720,7 @@ require('crypto').randomBytes(48, function(ex, buf) {
     console.log(token);
     user = new User({
                 full_name: body.full_name,
-                email: body.email,
+                email: body.email.toLowerCase(),
                 password: body.password,
                 hash: token
     });
