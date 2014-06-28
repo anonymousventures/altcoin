@@ -5549,6 +5549,7 @@ app.post('/remind', function(req,res){
 
 User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
 
+if (user != null){
 string = 'Welcome! \r\n Please activate your account by clicking the\
              link below: \r\n\r\n ' + prefix + 'activate/' + user.hash;
 
@@ -5575,7 +5576,7 @@ sendgrid.send({
 
 
 });
-
+} else res.end('Email not found');
 
 
 });
