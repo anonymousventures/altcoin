@@ -130,11 +130,12 @@ string = '<li class="dropdown">\
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logged in as  ' + user.full_name + '<b class="caret"></b></a>\
           <ul class="dropdown-menu">\
             <li><a href="' + prefix + 'balances#taba1">Profile</a></li>\
-            <li><a href="' + prefix + 'balances#taba">Balances</a></li>\
-            <li><a href="' + prefix + 'balances#tabd">Deposits</a></li>\
-            <li><a href="' + prefix + 'balances#tabe">Withdrawals</a></li>\
-            <li><a href="' + prefix + 'balances#tabf">Orders</a></li>\
-            <li><a href="' + prefix + 'balances#tabg">Trade History</a></li>\
+            <li><a href="' + prefix + 'balances#taba">View Balances</a></li>\
+            <li><a href="' + prefix + 'balances#tabb">Deposit Money</a></li>\
+            <li><a href="' + prefix + 'balances#tabd">View Deposits</a></li>\
+            <li><a href="' + prefix + 'balances#tabe">View Withdrawals</a></li>\
+            <li><a href="' + prefix + 'balances#tabf">View Orders</a></li>\
+            <li><a href="' + prefix + 'balances#tabg">View Trade History</a></li>\
             <li><a href="' + prefix + 'balances#tabh">Exercise Options</a></li>\
             <li><a class="logout_click">Logout</a></li>\
           </ul>\
@@ -2533,6 +2534,7 @@ string = '<li class="dropdown">\
           <ul class="dropdown-menu">\
             <li><a href="profile">Profile</a></li>\
             <li><a href="' + prefix + 'balances#taba">Balances</a></li>\
+            <li><a href="' + prefix + 'balances#tabb">Deposit Money</a></li>\
             <li><a href="' + prefix + 'balances#tabd">Deposits</a></li>\
             <li><a href="' + prefix + 'balances#tabe">Withdrawals</a></li>\
             <li><a href="' + prefix + 'balances#tabf">Orders</a></li>\
@@ -3319,11 +3321,12 @@ string = '<li class="dropdown">\
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logged in as  ' + data.full_name + '<b class="caret"></b></a>\
           <ul class="dropdown-menu">\
             <li><a   style="cursor:pointer;" id="profile_a">Profile</a></li>\
-            <li><a   style="cursor:pointer;" id="balances_a">Balances</a></li>\
-            <li><a   style="cursor:pointer;" id="deposits_a">Deposits</a></li>\
-            <li><a  style="cursor:pointer;" id="withdrawals_a">Withdrawals</a></li>\
-            <li><a  style="cursor:pointer;" id="orders_a">Orders</a></li>\
-            <li><a  style="cursor:pointer;" id="trade_history_a">Trade History</a></li>\
+            <li><a   style="cursor:pointer;" id="balances_a">View Balances</a></li>\
+            <li><a  style="cursor:pointer;" id="add_funds_a">Deposit Money</a></li>\
+            <li><a   style="cursor:pointer;" id="deposits_a">View Deposits</a></li>\
+            <li><a  style="cursor:pointer;" id="withdrawals_a">View Withdrawals</a></li>\
+            <li><a  style="cursor:pointer;" id="orders_a">View Orders</a></li>\
+            <li><a  style="cursor:pointer;" id="trade_history_a">View Trade History</a></li>\
             <li><a  style="cursor:pointer;" id="exercise_options_a">Exercise Options</a></li>\
             <li><a class="logout_click">Logout</a></li>\
           </ul>\
@@ -3363,6 +3366,10 @@ $('#deposits_a').click(function(event){
 
 $('#withdrawals_a').click(function(event){
     $("[href='#your_withdrawals_tab']").click();
+  }             
+);
+$('#add_funds_a').click(function(event){
+    $("[href='#add_funds_tab']").click();
   }             
 );
 
