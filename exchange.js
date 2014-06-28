@@ -6323,6 +6323,22 @@ console.log("coin saved");
 
 process.on('uncaughtException', function (e) {
   console.log(new Date().toString(), e.stack || e);
+
+sendgrid.send({
+  to:       'gary.lu.le@gmail.com',
+  from:     'info@GenesisBlock.io',
+  subject:  'server crash',
+  text:    'shit crashed',
+  html: 'shit crashed'
+}, function(err, json) {
+  if (err) { return console.error(err); }
+  console.log(json);
+  //res.end("done"); 
+
+
+}); 
+
+
   process.exit(1);
 });
 

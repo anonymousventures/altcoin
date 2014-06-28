@@ -21,8 +21,7 @@ $('.navbar-static-top').css('margin-bottom', '0px');
 
 
 
-
-
+if (document.URL.indexOf('forgot') == -1 )
 $.noty.defaults = {
     layout: 'bottomRight',
     theme: 'defaultTheme',
