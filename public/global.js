@@ -62,7 +62,13 @@ $.noty.defaults = {
 
 //end noty
 
-var socket = io.connect(prefix);
+var socket = io.connect('http://localhost');
+
+
+socket.on('fuck', function (data) {
+alert('fucked');
+
+});
 
 socket.on('deposit', function (data) {
     
@@ -624,16 +630,22 @@ alert(deposit_address);
 
 //connect to socket
 
-  if (document.URL.indexOf('org') != -1)
-      root = window.location.host;
+// alert('wtf');
+
+//alert(window.location.host);
+
+  if (document.URL.indexOf('.io') != -1)
+      root = 'http://genesisblock.io/';
   else 
-      root = 'http://localhost:8080';
+      root = 'http://localhost:8080/';
 
 
   var socket = io.connect(root);
 
 
   socket.on('fuck', function(fuck){
+
+    alert('fucked');
     //alert('wtf');
     //$('#bet_table').append(JSON.stringify(fuck));
   });

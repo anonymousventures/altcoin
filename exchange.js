@@ -1,3 +1,43 @@
+var cluster = require('cluster');
+RedisStore = require("socket.io/lib/stores/redis");
+redis = require("socket.io/node_modules/redis");
+pub = redis.createClient();
+sub = redis.createClient();
+cmd = redis.createClient();
+var redis = require('socket.io-redis');
+var os = require('os');
+
+if (cluster.isMaster) {
+ 
+
+
+
+
+
+
+
+  for (var i = 0; i < os.cpus().length; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', function(worker, code, signal) {
+    console.log('worker ' + worker.process.pid + ' died');
+  }); 
+}
+
+if (cluster.isWorker) {
+  //var express = require('express');
+  //var app = express();
+
+
+
+
+
+
+
+
+
+
 var jsdom = require("jsdom");
  var window = jsdom.jsdom().createWindow();
  var $ = require('./node_modules/jquery/dist/jquery')(window);
@@ -29,6 +69,34 @@ var Bitfinex = require('bitfinex');
 var bitfinex = new Bitfinex('0ZBJrWbWZ8UHJxsV2iR82RB9ISnbwXJNdLMLSf5JIFv', 'RM1RWQcO8H3K1mWOYhIQSgmpVnExznYuYqwH0zPg2FE');
 var Bitstamp = require('bitstamp');
 var bitstamp = new Bitstamp;
+
+
+var io = require('socket.io')(3000);
+var redis = require('socket.io-redis');
+io.adapter(redis({ host: 'localhost', port: 6379 }));
+
+
+  // io.sockets.on('connection', function(socket) {
+  //   socket.emit('data', 'connected to worker: ' + cluster.worker.id);
+  // });
+
+  // app.listen(80);
+
+
+//   io.on('connection', function (socket) {
+//   socket.emit('news', { hello: 'world' });
+//   socket.on('my other event', function (data) {
+//     console.log(data);
+//   });
+// });
+
+// var io = require('socket.io-emitter')();
+// setInterval(function(){
+//   //io.sockets.emit('fuck', new Date);
+// }, 3000);
+
+
+
 
 
     app.configure(function() {
@@ -9477,4 +9545,4 @@ Coin.findByIdAndUpdate(deposit.coin, {$inc:{pending_deposits: -1 * deposit.amoun
 
 server.listen(app.get('port'));
 
-
+}

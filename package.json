@@ -11,6 +11,7 @@
     "moment": "latest",
     "express": "3.3.5",
     "socket.io": "latest",
+    "socket.io-redis": "latest",
     "consolidate": "latest",
     "connect-mongo": "latest",
     "sendgrid": "latest",
