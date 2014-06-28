@@ -5831,8 +5831,8 @@ dogecoin = new Coin({
     coin_number: 2,
     withdraw_fee: 1,
     order_fee: .015,
-    balance: 100,
-    available_balance: 100
+    balance: 1000,
+    available_balance: 1000
 });
 
 dogecoin.save(function(err){
