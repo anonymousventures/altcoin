@@ -50,7 +50,7 @@ var bitstamp = new Bitstamp;
 
         var conditionalCSRF = function (req, res, next) {
           //compute needCSRF here as appropriate based on req.path or whatever
-          if ( req.path.indexOf('buy_order')!= -1  || req.path.indexOf('ask')!= -1 || req.path.indexOf('change_password')!= -1 || req.path.indexOf('exercise')!= -1 || req.path.indexOf('cancel_order')!= -1) {
+          if ( ( req.path.indexOf('withdraw')!= -1 && req.path.indexOf('withdraw/confirm')== -1) ||  req.path.indexOf('buy')!= -1  || req.path.indexOf('ask')!= -1 || req.path.indexOf('change_password')!= -1 || req.path.indexOf('exercise')!= -1 || req.path.indexOf('cancel_order')!= -1) {
             csrf(req, res, next);
           } else {
             next();
@@ -6568,7 +6568,14 @@ Order.find({$and: [{pending: 'pending'}, {side: 'ask'}, {swap: true}]}).sort('-t
 console.log(orderdata);
 
 res.render('index_exchange.html', {activated: JSON.stringify(activated), user: JSON.stringify(user),asks: JSON.stringify(asks),bids: JSON.stringify(bids), orderdata: JSON.stringify(orderdata)});
+//console.log('fucked ' + JSON.stringify(req.session));
+console.log(req.session);
+//console.log(JSON.stringify(express.session));
+        // store.get(req.session, function(err, session) {
+        //     // session
+        //     console.log(session);
 
+        // });
 
 });
 });
@@ -8387,7 +8394,7 @@ http.get(url, function(res) {
 });
 
 
-app.get('/withdraw/:coin', function(req,res){
+app.get('/withdraw/:coin', csrf, function(req,res){
 code = req.params.coin;
 console.log("testing " + code);
 Coin.findOne({code: code}, function(err, coin){

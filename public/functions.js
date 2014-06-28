@@ -475,7 +475,7 @@ table_header = '<div class="table-responsive"><table class="table table-bordered
 if (key == 0)
 selection_string = '<span key="' + key + '" style="text-align: left; margin-left: 0px !important">Select coin:</span>\
  <br> <select class="form-control select_coin" style="width:250px" >' + coin_selection + '</select><br>\
-    <span style="text-align: left; margin-left: 0px !important">Select by option type time:</span>\
+    <span style="text-align: left; margin-left: 0px !important">Select by option type:</span>\
  <br> <select class="form-control select_option" style="width:250px" >' + option_selection + '</select><br>\
  <span style="text-align: left; margin-left: 0px !important">Select by expiration time:</span>\
  <br> <select class="form-control select_expiration" style="width:250px" >' + expiration_selection + '</select><br>\
