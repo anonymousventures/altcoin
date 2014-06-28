@@ -5573,10 +5573,10 @@ sendgrid.send({
 
 });
 
-
+} else res.end('Email not found');
 
 });
-} else res.end('Email not found');
+
 
 
 });
