@@ -2201,7 +2201,7 @@ add_cancel_order_handler();
     <div id="error_message"></div>';
 
     if (activated)
-    string += '<div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>';
+    string += '<div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>';
     
     string += '<div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
@@ -2244,7 +2244,7 @@ add_cancel_order_handler();
             <div id="error_message_sell"></div>';
 
     if (activated)
-    string += '<div class="fail box">Your ' + coin_one_ticker_upper +' balance is <strong><a id="coin_one_balance" href="asdf" class="exchange_balance">' + coin_one_balance + '</a></strong>.</div>';
+    string += '<div class="fail box">Your ' + coin_one_ticker_upper +' balance is <strong><a id="coin_one_balance"  class="exchange_balance">' + coin_one_balance + '</a></strong>.</div>';
     
     string += '<div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> ' + coin_one_ticker_upper + '<br>\
@@ -2404,7 +2404,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
     <div id="error_message"></div>';
 
     if (activated)
-    string += '<div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a href="asdf" id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>';
+    string += '<div class="success box">Your ' + coin_two_ticker_upper + ' balance is <strong><a  id="coin_two_balance" class="exchange_balance">' + coin_two_balance + '</a></strong>.</div>';
     
     string += '<div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
@@ -2448,7 +2448,7 @@ if (document.URL.indexOf('optmarket') != -1 && document.URL.indexOf('altmarket')
             <div id="error_message_sell"></div>';
 
     if (activated)
-    string += '<div class="fail box">Your ' + ticker_flagged +' balance is <strong><a href="asdf"  id="coin_one_balance" class="exchange_balance">' + amount_flagged + '</a></strong>.</div>';
+    string += '<div class="fail box">Your ' + ticker_flagged +' balance is <strong><a  id="coin_one_balance" class="exchange_balance">' + amount_flagged + '</a></strong>.</div>';
     
     string += '<div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> options*<br>\
@@ -2611,7 +2611,7 @@ console.log(pending_asks[0].price);
     <div id="col1">\
     <h3>Buy ' + contract.short_symbol + '</h3>\
         <div id="error_message"></div>\
-    <div class="success box">Your available BTC balance is <strong><a href="asdf" class="exchange_balance">' + available_balance + '</a></strong>.</div>\
+    <div class="success box">Your available BTC balance is <strong><a  class="exchange_balance">' + available_balance + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="bid_quantity" name="amount" value="' + new Number(0).toFixed(9) + '" class="required"> ' + contract.short_symbol + '<br>\
                 <span class="label_style">Price Per ' + contract.short_symbol + ':</span> <input type="number" id="bid_price" name="price" value="' + (pending_asks[0].price + .000000001).toFixed(9) + '" class="required"> BTC<br>\
@@ -2656,7 +2656,7 @@ console.log(pending_asks[0].price);
     <div id="col2">\
     <h3>Sell ' + contract.short_symbol  + '</h3>\
     <div id="error_message_sell"></div>\
-<div class="fail box">Your available BTC balance is <strong><a href="asdf" class="exchange_balance">' + available_balance + '</a></strong>.</div>\
+<div class="fail box">Your available BTC balance is <strong><a  class="exchange_balance">' + available_balance + '</a></strong>.</div>\
     <div class="box options">\
                 <span class="label_style">Amount:</span> <input type="number" id="ask_quantity" name="amount" value="0.00000000" class="required"> ' + contract.short_symbol + '<br>\
                 <span class="label_style">Price Per ' + contract.short_symbol + ':</span> <input type="number" id="ask_price" name="price" value="' + pending_bids[0].price.toFixed(9) + '" class="required"> BTC<br>\

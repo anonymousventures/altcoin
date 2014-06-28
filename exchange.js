@@ -1351,6 +1351,7 @@ OrderData.find({$and: [{strike: strike}, {expiration: expiration}, {call_put: ki
 //console.log('fucked ' + order_data);
 object = new Object();
 
+if (order_data != undefined){
 $.each(order_data, function(key,val){
 minute_grouping = Math.floor(new Date(val.time).getTime()/ (1000 * 60));
 
@@ -1441,6 +1442,8 @@ if (high_price == null)
 
 
 res.render('trade_options.html', {kind: JSON.stringify(kind), activated: req.session.activated, user: JSON.stringify(req.session.user), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+}
+
 
 });
 
@@ -1539,7 +1542,7 @@ console.log(coin2);
 OrderData.find({$and: [{strike: strike}, {expiration: expiration}, {call_put: kind}, {coin_ticker_one: coin1}, {coin_ticker_two: coin2}, {swap: false}]}).sort({time: 1}).exec(function(err, order_data){
 //console.log('fucked ' + order_data);
 object = new Object();
-
+if (order_data != undefined){
 $.each(order_data, function(key,val){
 minute_grouping = Math.floor(new Date(val.time).getTime()/ (1000 * 60));
 
@@ -1627,6 +1630,7 @@ if (high_price == null)
 
 
 res.render('trade_options.html', {kind: JSON.stringify(kind), activated: JSON.stringify(false), user: JSON.stringify(null), chart_info: JSON.stringify(chart_array), csrf: JSON.stringify(req.session._csrf), volume: volume, coin_one_balance: coin_one_balance, coin_two_balance: coin_two_balance, last_price: last_price, low_price: low_price, high_price: high_price, coin_one_name: JSON.stringify(coin_one_name), coin_two_name: JSON.stringify(coin_two_name), coin_one_ticker: JSON.stringify(coin1), coin_two_ticker: JSON.stringify(coin2), kind: JSON.stringify(kind), strike: strike, expiration: expiration, pending_asks: JSON.stringify(pending_asks), pending_bids: JSON.stringify(pending_bids)});
+}
 
 });
 
