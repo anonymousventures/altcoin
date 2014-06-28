@@ -288,7 +288,7 @@ $.each(coin_data, function(key,val){
 
 
 substring = '<tr id="tab_row" style="margin-bottom: 30px">\
-        <td class="tab_td_order"><a class="contract_page_href" ticker="' + val.coin_one_ticker + '">' + val.coin_one_ticker.toUpperCase()  + '/' + val.coin_two_ticker.toUpperCase()  + '</td>\
+        <td class="tab_td_order"><a class="contract_page_href" ticker="' + val.coin_one_ticker + '">' + val.coin_one_name.toUpperCase()  + '/<br>' + val.coin_two_name.toUpperCase()  + '</td>\
         <td class="tab_td_order">' + val.last + '</td>\
         <td class="tab_td_order">' + val.bid + '</td>\
         <td class="tab_td_order">' + val.ask + '</td>\
@@ -445,7 +445,7 @@ high  = parseFloat(val.high).toFixed(5);
 
 
 href_ticker = val.coin_one_ticker + '/btc/' + val.call_put + '/' + val.strike.toFixed(9) + '/' + val.expiration;
-href_title = val.coin_one_ticker.toUpperCase() + '/BTC/' + val.call_put + '/<br>' + val.strike.toFixed(9) + '/<br>' + val.expiration;
+href_title = val.coin_one_name.toUpperCase() + '/<br>BITCOIN/' + val.call_put + '/<br>' + val.strike.toFixed(9) + '/<br>' + val.expiration;
 if (flag)
   flag_result = 'options_page_href2';
 else
