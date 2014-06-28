@@ -5648,11 +5648,11 @@ sendgrid.send({
 
 app.post('/forgot', function(req,res){
 
-User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
+// User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
 
-console.log(user.hash);
+// console.log(user.hash);
 
-});
+// });
 
 email = req.body.email;
 
