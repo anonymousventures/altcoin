@@ -9,11 +9,12 @@ else
 //begin noty
 
 //adjust navbar for mobile
-
+var mobile;
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
  // some code..
+ mobile = true;
 $('.navbar-fixed-top').attr('class', 'navbar navbar-default navbar-static-top');
-$('#top_area').css('margin-top', '0px');
+$('#top_area').css('margin-top', '0px !important');
 $('.navbar-static-top').css('margin-bottom', '0px');
 
 }
@@ -241,16 +242,23 @@ string += substring;
 string += '</tbody></table></div>\
 </div>';
 
-if (!activated)
-top_area = '<div id="top_area" class="center"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
+if (mobile)
+flagged_attr = 'style="margin-top: 0px !important"';
+else flagged_attr = '';
+
+//flagged_attr = '';
+
+if (!activated){
+top_area = '<div id="top_area" ' + flagged_attr + ' class="center"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
  <h3 id="index_top_middle">The world\'s first cryptocurrency options exchange</h3>\
 <span id="index_buttons">\
 <a type="button" class="btn btn-custom btn-lg" href="register">Register</a> <a type="button" class="btn btn-custom  btn-lg"  href="login">Log In</a> </span></div>';
-else 
-top_area = '<div id="top_area" class="center" style="height: 230px"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
+}
+else{ 
+top_area = '<div id="top_area" ' + flagged_attr + ' class="center" style="height: 230px"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
  <h3 id="index_top_middle">The world\'s first cryptocurrency options exchange</h3>\
 </div>';
-
+}
 
 middle_area = '<div class="index_col col-md-3 col-lg-3 col-sm-3 col-xs-3"><img style="height:50px" class="index_icon" src=\"' + prefix + '/img/trade_icon.png' +  '\">\
   <h3 class=\"desc\">Fast Trading </h3>\
