@@ -5583,9 +5583,7 @@ sendgrid.send({
 
 app.post('/forgot', function(req,res){
 
-stupid = req.session.stupid;
 
-stupid.update();
 
 email = req.body.email;
 
