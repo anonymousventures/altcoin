@@ -5583,11 +5583,11 @@ sendgrid.send({
 
 app.post('/forgot', function(req,res){
 
-User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
+// User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
 
-console.log(user.hash);
+// console.log(user.hash);
 
-});
+// });
 
 email = req.body.email;
 
@@ -6326,6 +6326,8 @@ console.log("coin saved");
 
 
 });
+
+console.log('ugh');
 
 process.on('uncaughtException', function (e) {
   console.log(new Date().toString(), e.stack || e);
