@@ -641,6 +641,11 @@ function dynamicSortMultiple() {
 }
 
 
+app.get('/sent', function(req,res){
+
+res.render('sent.html');
+
+});
 
 app.get('/register', function(req,res){
 
@@ -5539,7 +5544,41 @@ res.end('done');
 
 });
 
+app.post('/remind', function(req,res){
 
+
+User.findOne({email: req.body.email.toLowerCase()}, function(err, user){
+
+string = 'Welcome! \r\n Please activate your account by clicking the\
+             link below: \r\n\r\n ' + prefix + 'activate/' + user.hash;
+
+html = '<p>Hello,<br />\
+    Welcome to GenesisBlock. The following is your activation link:<br/><br/>\
+    <strong>' + prefix + 'activate/' + user.hash + '</strong></p>';
+
+
+sendgrid.send({
+  to:       req.body.email.toLowerCase(),
+  from:     'info@GenesisBlock.io',
+  subject:  'GenesisBlock - cryptocurrency exchange account activation',
+  text:     string,
+  html: html
+}, function(err, json) {
+
+  if (err) { return console.error(err); }
+
+  console.log(json);
+  res.end('done');
+
+});
+
+
+
+});
+
+
+
+});
 
 app.post('/forgot', function(req,res){
 
@@ -5839,6 +5878,7 @@ console.log('coin saved');
 });
 
 
+if ( ip.address() != '192.168.1.56'){
 
 x11coin_client.getNewAddress(function(err, address) {
 
@@ -6015,7 +6055,7 @@ console.log('coin saved');
 });
 
 
-
+}
 
 
 bitcoin_client.getNewAddress(function(err, address) {

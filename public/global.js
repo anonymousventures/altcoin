@@ -494,9 +494,12 @@ if (data == '1')
 alert("Account registered, but not activated yet. Please search for activation email in your inbox / spam folder");
 else if (data == '2')
 alert("Account already registered");
-else
-alert('Your activation link has been sent to: ' + email );
+else{
+//alert('Your activation link has been sent to: ' + email );
 
+window.location = prefix + 'sent';
+
+}
 
 });
 
