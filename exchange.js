@@ -1,9 +1,5 @@
 var cluster = require('cluster');
-RedisStore = require("socket.io/lib/stores/redis");
-redis = require("socket.io/node_modules/redis");
-pub = redis.createClient();
-sub = redis.createClient();
-cmd = redis.createClient();
+
 var redis = require('socket.io-redis');
 var os = require('os');
 
