@@ -115,7 +115,7 @@ io.adapter(redis({ host: 'localhost', port: 6379 }));
 
         var conditionalCSRF = function (req, res, next) {
           //compute needCSRF here as appropriate based on req.path or whatever
-          if ( ( req.path.indexOf('withdraw')!= -1 && req.path.indexOf('withdraw/confirm')== -1) ||  req.path.indexOf('buy')!= -1  || req.path.indexOf('ask')!= -1 || req.path.indexOf('change_password')!= -1 || req.path.indexOf('exercise')!= -1 || req.path.indexOf('cancel_order')!= -1) {
+          if ( ( req.path.indexOf('withdraw')!= -1 && req.path.indexOf('withdraw/confirm')== -1 && req.path.indexOf('select_withdraw')== -1) ||  req.path.indexOf('buy')!= -1  || req.path.indexOf('ask')!= -1 || req.path.indexOf('change_password')!= -1 || req.path.indexOf('exercise')!= -1 || req.path.indexOf('cancel_order')!= -1) {
             csrf(req, res, next);
           } else {
             next();
