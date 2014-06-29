@@ -3597,6 +3597,10 @@ add_withdraw_shit();
 //alert('here');
 
 function add_withdraw_shit(){
+
+
+//alert('yolodawg');
+
     $('#withdraw_amount').on('change', function () {
       console.log('yolo');
       withdraw_amount = $('#withdraw_amount').val();
@@ -3630,6 +3634,8 @@ function add_withdraw_shit(){
 
 
     $('#withdraw_button').click(function(){
+
+     // alert('yolo');
         amount = $('#withdraw_amount').val();
         address = $('#withdrawal_address').val();
         password = $('#withdraw_password').val();
@@ -3645,7 +3651,7 @@ function add_withdraw_shit(){
         $.ajax({
           url: "/withdraw",
           type: "POST",
-          data:  {amount: amount, address: address, password: password, coin_name: coin_name},
+          data:  {amount: amount, address: address, password: password, coin_name: coin_name, _csrf: csrf},
           dataType: "html"
         }).done(function(data){
                     //alert(data);
