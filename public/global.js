@@ -563,7 +563,7 @@ else alert(data);
 $('#forgot_button').click(function(){
 
 
-email = $('#email').val();
+email = $.trim($('#email').val());
 
 if ( email.length == 0 )
   alert('Please make sure you filled out your email address!');

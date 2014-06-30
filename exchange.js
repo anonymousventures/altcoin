@@ -5654,7 +5654,7 @@ app.post('/forgot', function(req,res){
 
 // });
 
-email = req.body.email;
+email = req.body.email.toLowerCase();
 
 User.findOne({email: email}, function(err, user){
 if (user == null)
