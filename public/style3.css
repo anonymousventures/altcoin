@@ -497,15 +497,17 @@ padding: 12px 15px;
 #right_header{
 
   float: right;
+  border-bottom: 1px solid grey;
 
 
 }
 
 .stat{
-  border-right: 1px solid #ddd;
+  //border-right: 1px solid #ddd;
   display: inline-block;
   font-size: 15px;
   padding: 0px 20px;
+  padding-bottom: 15px;
   
 }
 
