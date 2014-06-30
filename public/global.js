@@ -474,7 +474,7 @@ $("[href='#your_withdrawals_tab']").click();
 $('#register_button').click(function(){
 
 name = $('#name').val();
-email = $('#email').val();
+email = $.trim($('#email').val());
 password = $('#password').val();
 confirm_password = $('#confirm_password').val();
 
@@ -522,7 +522,7 @@ window.location = prefix + 'sent';
 $('#login_button').click(function(){
 
 
-email = $('#email').val();
+email = $.trim($('#email').val());
 password = $('#password').val();
 
 if ( email.length == 0 || password.length == 0 )
