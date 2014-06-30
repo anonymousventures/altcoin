@@ -259,13 +259,13 @@ else flagged_attr = '';
 
 if (!activated){
 top_area = '<div id="top_area" ' + flagged_attr + ' class="center"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
- <h3 id="index_top_middle">The world\'s first cryptocurrency options exchange</h3>\
+ <h3 id="index_top_middle">The world\'s first altcoin options exchange</h3>\
 <span id="index_buttons">\
 <a type="button" class="btn btn-custom btn-lg" href="register">Register</a> <a type="button" class="btn btn-custom  btn-lg"  href="login">Log In</a> </span></div>';
 }
 else{ 
 top_area = '<div id="top_area" ' + flagged_attr + ' class="center" style="height: 230px"><br><h1 id="index_top_header">GenesisBlock Exchange </h1>\
- <h3 id="index_top_middle">The world\'s first cryptocurrency options exchange</h3>\
+ <h3 id="index_top_middle">The world\'s first altcoin options exchange</h3>\
 </div>';
 }
 
