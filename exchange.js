@@ -718,6 +718,12 @@ res.render('register.html');
 
 });
 
+app.get('/terms', function(req,res){
+
+res.render('terms.html');
+
+});
+
 app.get('/login', function(req,res){
 
 res.render('login.html');
